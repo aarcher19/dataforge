@@ -72,8 +72,8 @@ Applies a function to each element.
 </details>
 
 ## Contributing
-(Describe how users can contribute, report issues, or submit improvements.)
+Currently using this as a learning experience and not looking for contributions at this time. But in the future as this expands I will update this section.
 
 ## License
-(Specify license information here.)
+Nothing yet.
 
