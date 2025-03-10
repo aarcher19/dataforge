@@ -1,6 +1,9 @@
+#include <criterion/alloc.h>
 #include <criterion/criterion.h>
+#include <criterion/internal/assert.h>
 #include <criterion/internal/test.h>
 #include <criterion/logging.h>
+#include <stdio.h>
 #include "../../includes/df_array.h"
 
 typedef struct df_array {
@@ -35,6 +38,21 @@ Test(df_array_suit, resize) {
   DfArray_Push(array, &val4);
   cr_assert(array->capacity > old_capacity, "Expected capacity to increase");
   cr_assert(array->length == 4, "Expected length to increase");
+  DfArray_Destroy(array);
+}
+
+Test(df_array_suit, shrink) {
+  DfArray *array = DfArray_Create(sizeof(int), 4);
+  int val1 = 1, val2 = 2, val3 = 3, val4 = 4;
+  DfArray_Push(array, &val1);
+  DfArray_Push(array, &val2);
+  int dest;
+  DfArray_Pop(array, &dest);
+  cr_assert(array->capacity == array->length, "Expected capacity to match length");
+  DfArray_Shift(array, &dest);
+  cr_assert(array->length == 0, "Expected length to be 0 but it is %zu", array->length);
+  cr_assert(array->items == NULL, "Expected items to be null");
+  cr_assert(array->capacity == 0, "Expected capacity to be 0 but was %zu", array->capacity);
   DfArray_Destroy(array);
 }
 
@@ -84,6 +102,18 @@ Test(df_array_suit, pop) {
   DfArray_Pop(array, &retrieved);
   cr_assert(retrieved == val1, "Expected retrieved to be equal to val1");
   cr_assert(array->length == 0, "Expected length to have decreased");
+  DfArray_Destroy(array);
+}
+
+Test(df_array_suit, shift) {
+  DfArray *array = DfArray_Create(sizeof(int), 4);
+  int nums[] = {10, 20, 30, 40, 50};
+  for(int i = 0; i < 5; i++){
+    DfArray_Push(array, &nums[i]);
+  }
+  int first;
+  DfArray_Shift(array, &first);
+  cr_assert(first == 10, "Expected first to equel 10");
   DfArray_Destroy(array);
 }
 

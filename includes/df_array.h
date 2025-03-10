@@ -51,6 +51,10 @@ void DfArray_Push(DfArray* array, void *value);
 
 void DfArray_Pop(DfArray* array, void *dest);
 
+void DfArray_Shift(DfArray* array, void *dest);
+
+void DfArray_Unshift(DfArray* array, void *value);
+
 void DfArray_Map(DfArray *array, void (*func)(void *));
 
 #endif

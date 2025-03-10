@@ -66,6 +66,25 @@ void DfArray_Resize(DfArray* array) {
   array->capacity = new_capacity;
 }
 
+void DfArray_Shrink(DfArray* array) {
+  if (array->length == 0) {
+    free(array->items);
+    array->items = NULL;
+    array->capacity = 0;
+    return;
+  }
+
+  size_t new_capacity = array->length;
+  void *shrunk_items = realloc(array->items, new_capacity * array->elem_size);
+
+  if (shrunk_items) {
+    array->items = shrunk_items;
+    array->capacity = new_capacity;
+  } else {
+    perror("Realloc failed in dfArray_Shrink.");
+  }
+}
+
 void DfArray_Push(DfArray* array, void *value) {
   // Handle array resizing if neccesary
   if (array->length >= array->capacity) {
@@ -84,8 +103,27 @@ void DfArray_Pop(DfArray *array, void *dest) {
     memcpy(dest, (char *)array->items + (array->length - 1) * array->elem_size, array->elem_size);
     array->length--;
 
+    if (array->length <= array->capacity/2 || array->length == 0) {
+      DfArray_Shrink(array);
+    }
   }
 }
+
+void DfArray_Shift(DfArray* array, void *dest) {
+  if (array->length == 0) {
+    fprintf(stderr, "Error: Cannot shift from an empty array\n");
+    exit(1);
+  }
+  memcpy(dest, array->items, array->elem_size);
+  memmove(array->items, (char *)array->items + array->elem_size, (array->length -1) * array->elem_size);
+  array->length--;
+
+  if (array->length <= array->capacity/2 || array->length == 0) {
+    DfArray_Shrink(array);
+  }
+}
+
+void DfArray_Unshift(DfArray* array, void *value);
 
 void DfArray_Map(DfArray *array, void (*func)(void *)) {
   for (size_t i = 0; i < array->length; i++) {
