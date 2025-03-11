@@ -51,13 +51,6 @@ DfArray_Shift(array, &shifted);
 printf("Shifted value: %d/n", shifted);
 ```
 
-### Accessing Elements Safely
-```c
-int retrieved;
-DfArray_Get(array, 0, &retrieved);
-printf("Retrieved value: %d\n", retrieved);
-```
-
 ### Applying a Function to All Elements
 ```c
 void printInt(void *item) {
