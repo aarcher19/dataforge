@@ -56,6 +56,19 @@ Test(df_array_suit, shrink) {
   DfArray_Destroy(array);
 }
 
+Test(df_array_suit, set) {
+  DfArray *array = DfArray_Create(sizeof(int), 2);
+  int val1 = 10, val2 = 20;
+  DfArray_Push(array, &val1);
+  DfArray_Push(array, &val2);
+  int newVal = 30;
+  DfArray_Set(array, 0, &newVal);
+  int check;
+  DfArray_Get(array, 0, &check);
+  cr_assert(check == 30, "Expected check to equal 30");
+  DfArray_Destroy(array);
+}
+
 Test(df_array_suit, push) {
   DfArray *array = DfArray_Create(sizeof(int), 2);
   int val1 = 10, val2 = 20, val3 = 30;
