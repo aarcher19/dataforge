@@ -1,9 +1,12 @@
+## Overview
+DataForge is a lightweight and extensible C library that provides high-level control over common data structures and utilities that are designed for efficiency, modularity and safety. DataForge aims to enhance C programming with modern, high-level abstractions while maintaining performance and flexibility.
+
 ## Data Structures
 
 <details>
   <summary><strong>DfArray - Dynamic Array</strong></summary>
 
-## Overview
+## DfArray
 DfArray is a lightweight, dynamic array that provides high-level and memory safe functionality to standard static C array's.
 
 ## Features
