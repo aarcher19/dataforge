@@ -27,14 +27,17 @@ DfArray *array = DfArray_Create(sizeof(int), 10);
 DfArray_Destroy(array);
 ```
 
-### Adding and Removing Elements
+### Getting and Setting Elements
 ```c
 int num = 10;
 DfArray_Set(array, 1, &num);
 int retrieved;
 DfArray_Get(array, 1, &retrieved);
 printf("Retrieved value: %d\n", retrieved);
+```
 
+### Adding and Removing Elements
+```c
 int value = 42;
 DfArray_Push(array, &value);
 int popped;
