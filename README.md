@@ -4,7 +4,7 @@
   <summary><strong>DfArray - Dynamic Array</strong></summary>
 
 ## Overview
-DfArray is a lightweight, dynamic array that provides high-level control over memory management and data structures. It features automatic resizing, bounds-checked element access, and support for mapping functions over elements.
+DfArray is a lightweight, dynamic array that provides high-level control over memory management and data structures.
 
 ## Features
 - **Dynamic resizing**: Automatically expands when elements are added.
