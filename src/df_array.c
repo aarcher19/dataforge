@@ -135,6 +135,31 @@ void DfArray_Unshift(DfArray* array, void *value) {
   array->length++;
 }
 
+void DfArray_InsertAt(DfArray *array, size_t index, void *value) {
+  if (index < array->length) {
+    if (array->length >= array->capacity) {
+      DfArray_Resize(array);
+    }
+
+    memmove(
+      (char *)array->items + (index + 1) * array->elem_size, 
+      (char *)array->items + index * array->elem_size, 
+      (array->length - index) * array->elem_size
+    );
+
+    memcpy((char *)array->items + index * array->elem_size, value, array->elem_size);
+
+    array->length++;
+  } else if (index == array->length) {
+    DfArray_Push(array, value);
+  } else {
+    fprintf(stderr, "Error: Index %zu out of bounds (length: %zu)\n", index, array->length);
+    exit(1);
+  }
+}
+
+void DfArray_RemoveAt(DfArray *array, size_t index);
+
 void DfArray_Map(DfArray *array, void (*func)(void *)) {
   for (size_t i = 0; i < array->length; i++) {
     func((char *)array->items + (i * array->elem_size));

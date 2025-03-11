@@ -142,6 +142,24 @@ Test(df_array_suit, unshift) {
   DfArray_Destroy(array);
 }
 
+Test(df_array_suit, insertAt) {
+  DfArray *array = DfArray_Create(sizeof(int), 5);
+  int nums[] = {10, 20, 30, 40, 50};
+  for(int i = 0; i < 5; i++){
+    DfArray_Push(array, &nums[i]);
+  }
+  int num = 60;
+  DfArray_InsertAt(array, 1, &num);
+  int retrived;
+  DfArray_Get(array, 1, &retrived);
+  cr_assert(retrived == num, "Expected retrived to be equel to num but got %d instead", retrived);
+  DfArray_InsertAt(array, 6, &retrived);
+  int popped;
+  DfArray_Pop(array, &popped);
+  cr_assert(popped == retrived, "Expected popped to be equel to retrieved");
+  DfArray_Destroy(array);
+}
+
 Test(df_array_suit, map) {
   DfArray *array = DfArray_Create(sizeof(int), 5);
   for (int i = 1; i <= 5; i++) {
