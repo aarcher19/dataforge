@@ -10,7 +10,7 @@ DfArray is a lightweight, dynamic array that provides high-level control over me
 - **Dynamic resizing**: Automatically expands when elements are added.
 - **Bounds checking**: Prevents out-of-bounds access with safe error handling.
 - **Generic storage**: Supports any data type via `void *` and configurable element sizes.
-- **Push/pop operations**: Similar to JavaScript arrays.
+- **Push/pop & unshift/shift operations**: Similar to JavaScript arrays.
 - **Functional mapping**: Apply functions to all elements.
 
 ## Installation
@@ -34,6 +34,11 @@ DfArray_Push(array, &value);
 int popped;
 DfArray_Pop(array, &popped);
 printf("Popped value: %d\n", popped);
+int value2 = 25;
+DfArray_Unshift(array, &value2);
+int shifted;
+DfArray_Shift(array, &shifted);
+printf("Shiffted value: %d/n", shifted);
 ```
 
 ### Accessing Elements Safely
@@ -61,10 +66,16 @@ Frees memory associated with the array.
 ### `void DfArray_Push(DfArray* array, void *value)`
 Adds an element to the end, resizing if needed.
 
-### `void DfArray_Pop(DfArray *array, void *dest)`
+### `void DfArray_Pop(DfArray* array, void *dest)`
 Removes and retrieves the last element.
 
-### `void DfArray_Get(DfArray *array, size_t index, void *dest)`
+### `void DfArray_Unshift(DfArray* array, void *value)`
+Adds an element to the front, resizing if needed.
+
+### `void DfArray_Shift(DfArray* array, void *dest)`
+Removes and retrieves the first element.
+
+### `void DfArray_Get(DfArray* array, size_t index, void *dest)`
 Retrieves an element with bounds checking.
 
 ### `void DfArray_Map(DfArray *array, void (*func)(void *))`
