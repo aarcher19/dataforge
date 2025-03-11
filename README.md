@@ -38,7 +38,7 @@ int value2 = 25;
 DfArray_Unshift(array, &value2);
 int shifted;
 DfArray_Shift(array, &shifted);
-printf("Shiffted value: %d/n", shifted);
+printf("Shifted value: %d/n", shifted);
 ```
 
 ### Accessing Elements Safely
