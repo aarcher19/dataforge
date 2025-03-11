@@ -123,7 +123,16 @@ void DfArray_Shift(DfArray* array, void *dest) {
   }
 }
 
-void DfArray_Unshift(DfArray* array, void *value);
+void DfArray_Unshift(DfArray* array, void *value) {
+  if (array->length >= array->capacity) {
+    DfArray_Resize(array);
+  }
+  
+  memmove((char *)array->items + array->elem_size, array->items, array->length * array->elem_size);
+  memcpy(array->items, value, array->elem_size);
+
+  array->length++;
+}
 
 void DfArray_Map(DfArray *array, void (*func)(void *)) {
   for (size_t i = 0; i < array->length; i++) {

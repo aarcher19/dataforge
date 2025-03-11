@@ -117,6 +117,18 @@ Test(df_array_suit, shift) {
   DfArray_Destroy(array);
 }
 
+Test(df_array_suit, unshift) {
+  DfArray *array = DfArray_Create(sizeof(int), 2);
+  int nums[] = {10, 20, 30};
+  for(int i = 0; i < 3; i++) {
+    DfArray_Unshift(array, &nums[i]);
+  }
+  int first;
+  DfArray_Shift(array, &first);
+  cr_assert(first == 30, "Expected first to equel 30 but is %d instead", first);
+  DfArray_Destroy(array);
+}
+
 Test(df_array_suit, map) {
   DfArray *array = DfArray_Create(sizeof(int), 5);
   for (int i = 1; i <= 5; i++) {
