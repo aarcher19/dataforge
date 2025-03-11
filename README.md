@@ -29,11 +29,18 @@ DfArray_Destroy(array);
 
 ### Adding and Removing Elements
 ```c
+int num = 10;
+DfArray_Set(array, 1, &num);
+int retrieved;
+DfArray_Get(array, 1, &retrieved);
+printf("Retrieved value: %d\n", retrieved);
+
 int value = 42;
 DfArray_Push(array, &value);
 int popped;
 DfArray_Pop(array, &popped);
 printf("Popped value: %d\n", popped);
+
 int value2 = 25;
 DfArray_Unshift(array, &value2);
 int shifted;
@@ -74,6 +81,9 @@ Adds an element to the front, resizing if needed.
 
 ### `void DfArray_Shift(DfArray* array, void *dest)`
 Removes and retrieves the first element.
+
+### `void DfArray_Set(DfArray* array, size_t index, void *value)`
+Updates a given element at a specified index.
 
 ### `void DfArray_Get(DfArray* array, size_t index, void *dest)`
 Retrieves an element with bounds checking.
