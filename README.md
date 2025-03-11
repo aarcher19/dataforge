@@ -4,7 +4,7 @@
   <summary><strong>DfArray - Dynamic Array</strong></summary>
 
 ## Overview
-DfArray is a lightweight, dynamic array that provides high-level control over memory management and data structures.
+DfArray is a lightweight, dynamic array that provides high-level and memory safe functionality to standard static C array's.
 
 ## Features
 - **Dynamic resizing**: Automatically expands when elements are added.
