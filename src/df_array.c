@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../includes/df_array.h"
+#include "../includes/iterator.h"
 
 // Core functionality
 
@@ -11,8 +12,6 @@ typedef struct DfArray {
   size_t elem_size;
   size_t capacity;
 } DfArray;
-
-
 
 DfArray* DfArray_Create(size_t elem_size, size_t initial_capacity) { 
   DfArray *array = malloc(sizeof(DfArray));
@@ -59,7 +58,12 @@ void DfArray_Shrink(DfArray* array) {
     free(array->items);
     array->items = NULL;
     array->capacity = 0;
-    return;
+    returntypedef struct Iterator {
+    void *structure;                   // Pointer to the data structure
+    void *current;                      // Current element (varies by structure)
+    void *(*next)(struct Iterator *);   // Function pointer to get the next element
+    int (*has_next)(struct Iterator *); // Function to check if more elements exist
+} Iterator;;
   }
 
   size_t new_capacity = array->length;
@@ -195,26 +199,27 @@ typedef struct DfArray_Iterator {
   size_t index;
 } DfArray_Iterator;
 
-DfArray_Iterator *DfArray_Iterator_Create(DfArray *array) {
-  DfArray_Iterator *it = malloc(sizeof(DfArray_Iterator));
-  if (!it) return NULL;
+int DfArray_Iterator_Has_Next(Iterator *it) {
+  DfArray_Iterator *arr_it = (DfArray_Iterator *)it->current;
+  return arr_it->index < arr_it->array->length;
+}
 
+void *DfArray_Iterator_Next(Iterator *it) {
+  DfArray_Iterator *arr_it = (DfArray_Iterator *)it->current;
+  if (!DfArray_Iterator_Has_Next(it)) return NULL;
+  return (char *)arr_it->array->items + (arr_it->index++ * arr_it->array->elem_size);
+}
+
+Iterator DfArray_Iterator_Create(DfArray *array) {
+  DfArray_Iterator *it = malloc(sizeof(DfArray_Iterator));
   it->array = array;
   it->index = 0;
-  return it;
+
+  return (Iterator){
+    .structure = array,
+    .current = it,
+    .next = DfArray_Iterator_Next,
+    .has_next = DfArray_Iterator_Has_Next
+  };
 }
 
-size_t DfArray_Iterator_Has_Next(DfArray_Iterator *it) {
-  return it->index < it->array->length;
-}
-
-void *DfArray_Iterator_Next(DfArray_Iterator *it) {
-  if (!DfArray_Iterator_Has_Next(it)) return NULL;
-  return (char *)it->array->items + (it->index++ * it->array->elem_size);
-}
-
-void DfArray_Iterator_Destroy(DfArray_Iterator *it) {
-  if (it) {
-    free(it);
-  }
-}

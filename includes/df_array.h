@@ -2,6 +2,7 @@
 #define ARRAY_H
 
 #include <stdio.h>
+#include "iterator.h"
 
 /*🔹 Insertion & Deletion
 DfArray_InsertAt(DfArray *array, size_t index, void *value)
@@ -37,15 +38,12 @@ void DfArray_RemoveAt(DfArray *array, size_t index);
 void DfArray_Map(DfArray *array, void (*func)(void *));
 
 // Iterator
-
 typedef struct DfArray_Iterator DfArray_Iterator;
 
-DfArray_Iterator *DfArray_Iterator_Create(DfArray *array);
+Iterator DfArray_Iterator_Create(DfArray *array);
 
-size_t DfArray_Iterator_Has_Next(DfArray_Iterator *it);
+int DfArray_Iterator_Has_Next(Iterator *it);
 
-void *DfArray_Iterator_Next(DfArray_Iterator *it);
-
-void DfArray_Iterator_Destroy(DfArray_Iterator *it);
+void *DfArray_Iterator_Next(Iterator *it);
 
 #endif
