@@ -15,6 +15,7 @@ DataForge is a lightweight and extensible C library that provides high-level con
   - **Generic storage**: Supports any data type via `void *` and configurable element sizes.
   - **Push/pop & unshift/shift operations**: Similar to JavaScript arrays.
   - **Functional mapping**: Apply functions to all elements.
+  - **Iteration**: Iterate sequentially through all elements.
   
   <details>
     <summary><strong>Usage</strong></summary>
@@ -54,6 +55,22 @@ DataForge is a lightweight and extensible C library that provides high-level con
   DfArray_Get(array, 1, &inserted);
   printf("Inserted value: %d\n", inserted);
   DfArray_RemoveAt(array, 1);
+  ```
+  #### Iteration
+  ```c
+  DfArray *array = DfArray_Create(sizeof(int), 3);
+  int nums[] = {10, 20, 30};
+  for(int i = 0; i < 3; i++){
+    DfArray_Push(array, &nums[i]);
+  }
+
+  Iterator it = DfArray_Iterator_Create(array);
+  while(it.has_next(&it)){
+    printf("Value: %d", *(int *)it.next(&it));
+  };
+
+  Iterator_Destroy(&it);
+  DfArray_Destroy(array);
   ```
   
   #### Applying a Function to All Elements
@@ -100,6 +117,16 @@ DataForge is a lightweight and extensible C library that provides high-level con
   
   #### `void DfArray_Map(DfArray *array, void (*func)(void *))`
   Applies a function to each element.
+
+  #### `Iterator DfArray_Iterator_Create(DfArray *array)`
+  Creates an iterator for a dynamic array.
+  
+  #### `int DfArray_Iterator_Has_Next(Iterator *it)`
+  Checks if there is a value to iterate over.
+  
+  #### `void *DfArray_Iterator_Next(Iterator *it)`
+  Iterates over the next value in the array.
+  
   </details>  
 </details>
 
