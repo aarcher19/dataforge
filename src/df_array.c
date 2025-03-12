@@ -58,12 +58,7 @@ void DfArray_Shrink(DfArray* array) {
     free(array->items);
     array->items = NULL;
     array->capacity = 0;
-    returntypedef struct Iterator {
-    void *structure;                   // Pointer to the data structure
-    void *current;                      // Current element (varies by structure)
-    void *(*next)(struct Iterator *);   // Function pointer to get the next element
-    int (*has_next)(struct Iterator *); // Function to check if more elements exist
-} Iterator;;
+    return;
   }
 
   size_t new_capacity = array->length;

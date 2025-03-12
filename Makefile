@@ -1,41 +1,38 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Iincludes
-LIB_DIR = lib
+CFLAGS = -Wall -Wextra -fPIC 
+LDFLAGS = -shared 
+
+INCLUDES_DIR = includes
 SRC_DIR = src
 BUILD_DIR = build
+LIB_DIR = lib
 
-# source files
-ARRAY_SRC = $(SRC_DIR)/df_array.c
-STRING_SRC = $(SRC_DIR)/string.c
+SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
+OBJ_FILES = $(SRC_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 
-# object files
-ARRAY_OBJ = $(BUILD_DIR)/df_array.o
-STRING_OBJ = $(BUILD_DIR)/string.o
+LIB_NAME = $(LIB_DIR)/libdataforge.so
 
-# output libs
-ARRAY_LIB = $(LIB_DIR)/libdf_array.a
-STRING_LIB = $(LIB_DIR)/libstring.a
+all: $(LIB_NAME)
 
-all: $(ARRAY_LIB) $(STRING_LIB)
+$(LIB_NAME): $(OBJ_FILES)
+	$(CC) $(LDFLAGS) $(OBJ_FILES) -o $(LIB_NAME)
 
-# compile libint_array.a
-$(ARRAY_LIB): $(ARRAY_OBJ) | $(LIB_DIR)
-	ar rcs $@ $^
-
-# compile libstring.a
-$(STRING_LIB): $(STRING_OBJ) | $(LIB_DIR)
-	ar rcs $@ $^
-
-# compile source files to object files
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) -I$(INCLUDES_DIR) -c $< -o $@
 
 clean:
 	rm -rf $(BUILD_DIR)/*.o $(LIB_DIR)/*.a
-	
 
-$(LIB_DIR):
-	mkdir -p $(LIB_DIR)
+INSTALL_INCLUDE_DIR = /usr/local/include/dataforge  
+INSTALL_LIB_DIR = /usr/local/lib
 
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+install:
+	mkdir -p $(INSTALL_INCLUDE_DIR)                  
+	mkdir -p $(INSTALL_LIB_DIR)                      
+	cp $(LIB_NAME) $(INSTALL_LIB_DIR)/               
+	cp -r $(INCLUDES_DIR)/* $(INSTALL_INCLUDE_DIR)
+	sudo ldconfig
+
+uninstall:
+	rm -f $(INSTALL_LIB_DIR)/libdataforge.so
+	rm -rf $(INSTALL_INCLUDE_DIR)

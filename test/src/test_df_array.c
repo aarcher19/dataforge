@@ -4,9 +4,9 @@
 #include <criterion/internal/test.h>
 #include <criterion/logging.h>
 #include <stdio.h>
-#include "../../includes/df_array.h"
+#include <dataforge/df_array.h>
 
-typedef struct df_array {
+typedef struct DfArray {
   void *items;
   size_t length;
   size_t elem_size;
@@ -43,7 +43,7 @@ Test(df_array_suit, resize) {
 
 Test(df_array_suit, shrink) {
   DfArray *array = DfArray_Create(sizeof(int), 4);
-  int val1 = 1, val2 = 2, val3 = 3, val4 = 4;
+  int val1 = 1, val2 = 2;
   DfArray_Push(array, &val1);
   DfArray_Push(array, &val2);
   int dest;
