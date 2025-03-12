@@ -158,7 +158,25 @@ void DfArray_InsertAt(DfArray *array, size_t index, void *value) {
   }
 }
 
-void DfArray_RemoveAt(DfArray *array, size_t index);
+void DfArray_RemoveAt(DfArray *array, size_t index) {
+  if (index < array->length) {
+    memmove(
+      (char *)array->items + index * array->elem_size,
+      (char *)array->items + (index + 1) * array->elem_size,
+      (array->length - index - 1) * array->elem_size
+    );
+
+    array->length--;
+
+  } else {
+    fprintf(stderr, "Error: Index %zu out of bounds (length: %zu)\n", index, array->length);
+    exit(1);
+  }
+
+  if (array->length < array->capacity/2) {
+      DfArray_Shrink(array);
+  }
+}
 
 void DfArray_Map(DfArray *array, void (*func)(void *)) {
   for (size_t i = 0; i < array->length; i++) {

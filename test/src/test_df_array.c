@@ -160,6 +160,22 @@ Test(df_array_suit, insertAt) {
   DfArray_Destroy(array);
 }
 
+Test(df_array_suit, removeAt) {
+  DfArray *array = DfArray_Create(sizeof(int), 5);
+  int nums[] = {10, 20, 30, 40, 50};
+  for(int i = 0; i < 5; i++){
+    DfArray_Push(array, &nums[i]);
+  }
+  DfArray_RemoveAt(array, 3);
+  int num;
+  DfArray_Get(array, 3, &num);
+  cr_assert(num == 50, "Expected 40 to be removed and 50 to be in its place");
+  DfArray_RemoveAt(array, 3);
+  DfArray_Pop(array, &num);
+  cr_assert(num == 30, "Expected 50 to be removed and 30 to be popped off");
+  DfArray_Destroy(array);
+}
+
 Test(df_array_suit, map) {
   DfArray *array = DfArray_Create(sizeof(int), 5);
   for (int i = 1; i <= 5; i++) {
