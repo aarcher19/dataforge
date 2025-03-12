@@ -212,3 +212,9 @@ void *DfArray_Iterator_Next(DfArray_Iterator *it) {
   if (!DfArray_Iterator_Has_Next(it)) return NULL;
   return (char *)it->array->items + (it->index++ * it->array->elem_size);
 }
+
+void DfArray_Iterator_Destroy(DfArray_Iterator *it) {
+  if (it) {
+    free(it);
+  }
+}
