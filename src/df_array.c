@@ -3,12 +3,16 @@
 #include <string.h>
 #include "../includes/df_array.h"
 
-typedef struct df_array {
+// Core functionality
+
+typedef struct DfArray {
   void *items;
   size_t length;
   size_t elem_size;
   size_t capacity;
 } DfArray;
+
+
 
 DfArray* DfArray_Create(size_t elem_size, size_t initial_capacity) { 
   DfArray *array = malloc(sizeof(DfArray));
@@ -183,3 +187,28 @@ void DfArray_Map(DfArray *array, void (*func)(void *)) {
     func((char *)array->items + (i * array->elem_size));
   }
 };
+
+// Iterator
+
+typedef struct DfArray_Iterator {
+  DfArray *array;
+  size_t index;
+} DfArray_Iterator;
+
+DfArray_Iterator *DfArray_Iterator_Create(DfArray *array) {
+  DfArray_Iterator *it = malloc(sizeof(DfArray_Iterator));
+  if (!it) return NULL;
+
+  it->array = array;
+  it->index = 0;
+  return it;
+}
+
+size_t DfArray_Iterator_Has_Next(DfArray_Iterator *it) {
+  return it->index < it->array->length;
+}
+
+void *DfArray_Iterator_Next(DfArray_Iterator *it) {
+  if (!DfArray_Iterator_Has_Next(it)) return NULL;
+  return (char *)it->array->items + (it->index++ * it->array->elem_size);
+}

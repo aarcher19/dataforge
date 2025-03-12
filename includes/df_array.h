@@ -11,7 +11,7 @@ DfArray_RemoveAt(DfArray *array, size_t index)
 Removes an element at a given index, shifting elements left.
 */
 
-typedef struct df_array DfArray;
+typedef struct DfArray DfArray;
 
 DfArray* DfArray_Create(size_t elem_size, size_t initial_capcity);
 
@@ -35,5 +35,17 @@ void DfArray_RemoveAt(DfArray *array, size_t index);
 
 // Will be removed after iterators and utils are implemented!
 void DfArray_Map(DfArray *array, void (*func)(void *));
+
+// Iterator
+
+typedef struct DfArray_Iterator DfArray_Iterator;
+
+DfArray_Iterator *DfArray_Iterator_Create(DfArray *array);
+
+size_t DfArray_Iterator_Has_Next(DfArray_Iterator *it);
+
+void *DfArray_Iterator_Next(DfArray_Iterator *it);
+
+void DfArray_Iterator_Destroy(DfArray_Iterator *it);
 
 #endif
