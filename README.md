@@ -18,7 +18,8 @@ DataForge is a lightweight and extensible C library that provides high-level con
   
   <details>
     <summary><strong>Usage</strong></summary>
-     #### Creating and Destroying an Array
+  
+  #### Creating and Destroying an Array
   ```c
   DfArray *array = DfArray_Create(sizeof(int), 10);
   DfArray_Destroy(array);
@@ -66,7 +67,8 @@ DataForge is a lightweight and extensible C library that provides high-level con
 
   <details>
     <summary><strong>API Reference</strong></summary>
-    #### `DfArray* DfArray_Create(size_t elem_size, size_t initial_capacity)`
+    
+  #### `DfArray* DfArray_Create(size_t elem_size, size_t initial_capacity)`
   Allocates a new dynamic array.
   
   #### `void DfArray_Destroy(DfArray* array)`
