@@ -5,6 +5,7 @@
 #include <criterion/logging.h>
 #include <stdio.h>
 #include <dataforge/df_array.h>
+#include <dataforge/iterator.h>
 
 typedef struct DfArray {
   void *items;
@@ -173,6 +174,23 @@ Test(df_array_suit, removeAt) {
   DfArray_RemoveAt(array, 3);
   DfArray_Pop(array, &num);
   cr_assert(num == 30, "Expected 50 to be removed and 30 to be popped off");
+  DfArray_Destroy(array);
+}
+
+Test(df_array_suit, iterator) {
+  DfArray *array = DfArray_Create(sizeof(int), 3);
+  int nums[] = {10, 20, 30};
+  for(int i = 0; i < 3; i++){
+    DfArray_Push(array, &nums[i]);
+  }
+  int j = 0;
+  Iterator it = DfArray_Iterator_Create(array);
+  while(it.has_next(&it)){
+    cr_assert(*(int *)it.next(&it) == nums[j], "Expected value to be %d", nums[j]);
+    j++;
+  };
+  Iterator_Destroy(&it);
+  cr_assert(it.current == NULL, "Iterator not freed properly");
   DfArray_Destroy(array);
 }
 
