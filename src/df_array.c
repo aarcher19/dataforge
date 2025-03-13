@@ -204,6 +204,21 @@ void *DfArray_Iterator_Next(Iterator *it) {
   if (!DfArray_Iterator_Has_Next(it)) return NULL;
   return (char *)arr_it->array->items + (arr_it->index++ * arr_it->array->elem_size);
 }
+    
+void *DfArray_Create_New(Iterator *it) {
+  DfArray_Iterator *arr_it = (DfArray_Iterator *)it->current;
+
+  DfArray *new_array = DfArray_Create(arr_it->array->elem_size, arr_it->array->capacity);
+
+  return new_array;
+}
+
+void DfArray_Insert_New(Iterator *it, void *new_ds) {
+  DfArray_Iterator *arr_it = (DfArray_Iterator *)it->current;
+  DfArray *arr = (DfArray *)new_ds;
+  
+  DfArray_Push(arr, (char *)arr_it->array->items + (arr_it->index * arr_it->array->elem_size));
+}
 
 Iterator DfArray_Iterator_Create(DfArray *array) {
   DfArray_Iterator *it = malloc(sizeof(DfArray_Iterator));
@@ -214,7 +229,9 @@ Iterator DfArray_Iterator_Create(DfArray *array) {
     .structure = array,
     .current = it,
     .next = DfArray_Iterator_Next,
-    .has_next = DfArray_Iterator_Has_Next
+    .has_next = DfArray_Iterator_Has_Next,
+    .create_new = DfArray_Create_New,
+    .insert_new = DfArray_Insert_New
   };
 }
 
