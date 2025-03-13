@@ -130,6 +130,12 @@ DataForge is a lightweight and extensible C library that provides high-level con
   </details>  
 </details>
 
+## Utils
+
+<details>
+  <summary><strong>Generic</strong></summary>
+</details>
+
 ## Contributing
 Currently using this as a learning experience and not looking for contributions at this time. But in the future as this expands I will update this section.
 
