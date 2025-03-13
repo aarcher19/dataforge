@@ -2,7 +2,7 @@
 #define ARRAY_H
 
 #include <stdio.h>
-#include "iterator.h"
+#include "df_iterator.h"
 
 /*🔹 Insertion & Deletion
 DfArray_InsertAt(DfArray *array, size_t index, void *value)

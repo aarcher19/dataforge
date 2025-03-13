@@ -1,5 +1,5 @@
-#ifndef ITERATOR_H
-#define ITERATOR_H
+#ifndef DF_ITERATOR_H
+#define DF_ITERATOR_H
 
 typedef struct Iterator {
     void *structure;                   // Pointer to the data structure

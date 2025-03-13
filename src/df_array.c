@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../includes/df_array.h"
-#include "../includes/iterator.h"
+#include "../includes/df_iterator.h"
 
 // Core functionality
 

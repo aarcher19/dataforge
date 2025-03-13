@@ -5,7 +5,7 @@
 #include <criterion/logging.h>
 #include <stdio.h>
 #include <dataforge/df_array.h>
-#include <dataforge/iterator.h>
+#include <dataforge/df_iterator.h>
 
 typedef struct DfArray {
   void *items;
