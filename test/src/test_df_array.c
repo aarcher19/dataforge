@@ -194,6 +194,40 @@ Test(df_array_suit, iterator) {
   DfArray_Destroy(array);
 }
 
+Test(df_array_suit, create_new_and_insert_new) {
+    DfArray *original = DfArray_Create(sizeof(int), 5);
+    
+    int values[] = {1, 2, 3, 4, 5};
+    for (int i = 0; i < 5; i++) {
+        DfArray_Push(original, &values[i]);
+    }
+
+    Iterator it = DfArray_Iterator_Create(original);
+
+    DfArray *new_array = (DfArray *)it.create_new(&it);
+    cr_assert_not_null(new_array, "create_new() should return a valid DfArray pointer.");
+    cr_assert_eq(new_array->length, 0, "New array should start with length 0.");
+    cr_assert_eq(new_array->capacity, original->capacity, "New array should have the same initial capacity.");
+    cr_assert_eq(new_array->elem_size, original->elem_size, "New array should have the same element size.");
+
+    while (it.has_next(&it)) {
+      void *element = it.next(&it);
+      it.insert_new(new_array, element);
+    }
+
+    cr_assert_eq(new_array->length, original->length, "New array should have the same length as the original.");
+
+    for (size_t i = 0; i < original->length; i++) {
+        int original_value, new_value;
+        DfArray_Get(original, i, &original_value);
+        DfArray_Get(new_array, i, &new_value);
+        cr_assert_eq(original_value, new_value, "Elements at index %zu should be equal in both arrays.", i);
+    }
+
+    DfArray_Destroy(original);
+    DfArray_Destroy(new_array);
+}
+
 Test(df_array_suit, map) {
   DfArray *array = DfArray_Create(sizeof(int), 5);
   for (int i = 1; i <= 5; i++) {

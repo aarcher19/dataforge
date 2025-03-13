@@ -213,11 +213,10 @@ void *DfArray_Create_New(Iterator *it) {
   return new_array;
 }
 
-void DfArray_Insert_New(Iterator *it, void *new_ds) {
-  DfArray_Iterator *arr_it = (DfArray_Iterator *)it->current;
+void DfArray_Insert_New(void *new_ds, void *element) {
   DfArray *arr = (DfArray *)new_ds;
   
-  DfArray_Push(arr, (char *)arr_it->array->items + (arr_it->index * arr_it->array->elem_size));
+  DfArray_Push(arr, element);
 }
 
 Iterator DfArray_Iterator_Create(DfArray *array) {
