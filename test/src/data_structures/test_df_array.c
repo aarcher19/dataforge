@@ -4,8 +4,8 @@
 #include <criterion/internal/test.h>
 #include <criterion/logging.h>
 #include <stdio.h>
-#include <dataforge/df_array.h>
-#include <dataforge/df_iterator.h>
+#include "../includes/df_array.h"
+#include "../includes/df_iterator.h"
 
 typedef struct DfArray {
   void *items;
