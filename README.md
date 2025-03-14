@@ -155,8 +155,8 @@ DataForge is a lightweight and extensible C library that provides high-level con
 
   Iterator it = DfArray_Iterator_Create(array);
 
-  // cast returned data structure to an int
-  int *new_array = (int *)DfMap(it, double_element);
+  // cast returned data structure to proper type
+  DfArray *new_array = (DfArray *)DfMap(&it, double_element);
   ```
   
   
