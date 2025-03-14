@@ -133,7 +133,7 @@ DataForge is a lightweight and extensible C library that provides high-level con
 ## Utils
 
 <details>
-  <summary><strong>Generic</strong></summary>
+  <summary><strong>Generic - Can be used with any data structure</strong></summary>
 
   ### `void *DfMap(Iterator *it, void *(*func)(void *element))`
   DfMap takes an iterator and a function pointer as arguments. It iterates over any data structure and apply's a function to each element, then returns a new data structure      containing the modified elements.
