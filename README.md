@@ -134,6 +134,32 @@ DataForge is a lightweight and extensible C library that provides high-level con
 
 <details>
   <summary><strong>Generic</strong></summary>
+
+  ### `void *DfMap(Iterator *it, void *(*func)(void *element))`
+  DfMap takes an iterator and a function pointer as arguments. It iterates over any data structure and apply's a function to each element, then returns a new data structure      containing the modified elements.
+
+  ### Usage
+  ```c
+  DfArray *array = DfArray_Create(sizeof(int), 3);
+  int nums[] = {10, 20, 30};
+  for(int i = 0; i < 3; i++){
+    DfArray_Push(array, &nums[i]);
+  }
+
+  void *double_element(void *element) {
+    int *value = (int *)element;
+    int *modified_value = malloc(sizeof(int));
+    *modified_value = (*value) * 2;
+    return modified_value;
+  }
+
+  Iterator it = DfArray_Iterator_Create(array);
+
+  // cast returned data structure to an int
+  int *new_array = (int *)DfMap(it, double_element);
+  ```
+  
+  
 </details>
 
 ## Contributing
