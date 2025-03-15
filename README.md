@@ -163,7 +163,7 @@ DataForge is a lightweight and extensible C library that provides high-level con
 
   ### Usage
   ```c
-   DfArray *array = DfArray_Create(sizeof(int), 3);
+  DfArray *array = DfArray_Create(sizeof(int), 3);
   int nums[] = {10, 23, 30};
   for(int i = 0; i < 3; i++){
     DfArray_Push(array, &nums[i]);
@@ -178,7 +178,32 @@ DataForge is a lightweight and extensible C library that provides high-level con
   // Cast returned data structure to propper type
   DfArray *filtered = (DfArray *)DfFilter(&it, isEven);
   ```
-  
+
+### `void *DfFind(Iterator *it, bool (*func)(void *element))`
+DfFind takes an iterator and a function pointer that returns a bool as parameters. It iterates over any data structure and applies the comparison function to each elemenet. It then returns the first element that meets the condition in the comparison function.
+
+### Usage
+```c
+DfArray *array = DfArray_Create(sizeof(int), 3);
+int nums[] = {10, 23, 30};
+for(int i = 0; i < 3; i++){
+    DfArray_Push(array, &nums[i]);
+}
+
+bool greater_than_10(void *element) {
+  return *(int *)element > 10;
+}
+
+Iterator it = DfArray_Iterator_Create(array);
+void *found = DfFind(&it, greater_than_10);
+
+// Best practice to check for null before casting to propper type
+if (found != NULL) {
+  printf("Found element: %d", *(int *)found);
+} else {
+  printf("No element found");
+}
+```
 </details>
 
 ## Contributing
