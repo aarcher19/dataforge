@@ -164,7 +164,7 @@ DataForge is a lightweight and extensible C library that provides high-level con
   ### Usage
   ```c
    DfArray *array = DfArray_Create(sizeof(int), 3);
-  int nums[] = {10, 20, 30};
+  int nums[] = {10, 23, 30};
   for(int i = 0; i < 3; i++){
     DfArray_Push(array, &nums[i]);
   }
