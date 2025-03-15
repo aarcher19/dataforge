@@ -17,9 +17,18 @@ bool isEven(void *element) {
   return *(int *)element % 2 == 0;
 }
 
+bool greater_than_10(void *element) {
+  return *(int *)element > 10;
+}
+
+bool greater_than_30(void *element) {
+  return *(int *)element > 30;
+}
+
+
 // map tests
 
-Test(generic_utils, map_df_array) {
+Test(generic_utils_suit, map_df_array) {
   DfArray *array = DfArray_Create(sizeof(int), 3);
   int nums[] = {10, 20, 30};
   for(int i = 0; i < 3; i++) {
@@ -39,7 +48,7 @@ Test(generic_utils, map_df_array) {
 
 // filter tests
 
-Test(generic_utils, filter_df_array) {
+Test(generic_utils_suit, filter_df_array) {
   DfArray *array = DfArray_Create(sizeof(int), 3);
   int nums[] = {10, 23, 30};
   for(int i = 0; i < 3; i++) {
@@ -55,4 +64,22 @@ Test(generic_utils, filter_df_array) {
   Iterator_Destroy(&it);
   DfArray_Destroy(array);
   DfArray_Destroy(filtered);
+}
+
+// find tests
+
+Test(generic_utils_suit, find_df_array) {
+  DfArray *array = DfArray_Create(sizeof(int), 3);
+  int nums[] = {10, 23, 30};
+  for(int i = 0; i < 3; i++) {
+    DfArray_Push(array, &nums[i]);
+  }
+  Iterator it = DfArray_Iterator_Create(array);
+  void *found = DfFind(&it, greater_than_10);
+  cr_assert(*(int *)found == 23, "Expected first element to meet condition to be 23");
+  found = DfFind(&it, greater_than_30);
+  cr_assert(found == NULL, "Expected find to be NULL");
+  Iterator_Destroy(&it);
+  DfArray_Destroy(array);
+  free(found);
 }

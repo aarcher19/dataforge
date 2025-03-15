@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g -I../includes
-LDFLAGS = -lcriterion -L../lib -ldataforge -Wl,-rpath-link,../lib
+LDFLAGS = -L../lib -ldataforge -lcriterion 
 
 SRC_DIR = src
 UTIL_DIR = $(SRC_DIR)/utils
@@ -13,7 +13,7 @@ TEST_BIN = $(BIN_DIR)/test_runner
 all: test
 
 test: $(TEST_BIN)
-	./$(TEST_BIN) --verbose
+	LD_LIBRARY_PATH=../lib:$$LD_LIBRARY_PATH ./$(TEST_BIN) --verbose
 
 $(TEST_BIN): $(TEST_SRC)
 	mkdir -p $(BIN_DIR)

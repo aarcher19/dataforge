@@ -8,4 +8,6 @@ void *DfMap(Iterator *it, void *(*func)(void *element));
 
 void *DfFilter(Iterator *it, bool (*func)(void *element));
 
+void *DfFind(Iterator *it, bool (*func)(void *element));
+
 #endif
