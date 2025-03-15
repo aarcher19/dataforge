@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g -I../includes
-LDFLAGS = -lcriterion -L../lib -ldataforge
+LDFLAGS = -lcriterion -L../lib -ldataforge -Wl,-rpath-link,../lib
 
 SRC_DIR = src
 UTIL_DIR = $(SRC_DIR)/utils

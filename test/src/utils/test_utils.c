@@ -13,6 +13,10 @@ void *double_value2(void *element) {
     return element;
 }
 
+bool isEven(void *element) {
+  return *(int *)element % 2 == 0;
+}
+
 // map tests
 
 Test(generic_utils, map_df_array) {
@@ -33,4 +37,22 @@ Test(generic_utils, map_df_array) {
   DfArray_Destroy(modified_array);
 }
 
+// filter tests
 
+Test(generic_utils, filter_df_array) {
+  DfArray *array = DfArray_Create(sizeof(int), 3);
+  int nums[] = {10, 23, 30};
+  for(int i = 0; i < 3; i++) {
+    DfArray_Push(array, &nums[i]);
+  }
+  Iterator it = DfArray_Iterator_Create(array);
+  DfArray *filtered = (DfArray *)DfFilter(&it, isEven);
+  int num;
+  DfArray_Get(filtered, 0, &num); 
+  cr_assert(num == 10, "Expected num to equal 10");
+  DfArray_Get(filtered, 1, &num); 
+  cr_assert(num == 30, "Expected num to equal 10");
+  Iterator_Destroy(&it);
+  DfArray_Destroy(array);
+  DfArray_Destroy(filtered);
+}
