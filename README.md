@@ -158,7 +158,26 @@ DataForge is a lightweight and extensible C library that provides high-level con
   // cast returned data structure to proper type
   DfArray *new_array = (DfArray *)DfMap(&it, double_element);
   ```
-  
+  ### `void *DfFilter(Iterator *it, bool (*func)(void *element))`
+  DfFilter takes an iterator and function pointer that returns a bool as parameters. It iterates over any data structure and applies the comparison function to each element. It then returns a new data structure containing the filtered elements that met the condition in the comparison function.
+
+  ### Usage
+  ```c
+   DfArray *array = DfArray_Create(sizeof(int), 3);
+  int nums[] = {10, 20, 30};
+  for(int i = 0; i < 3; i++){
+    DfArray_Push(array, &nums[i]);
+  }
+
+  bool isEven(void *element) {
+    return *(int *)element % 2 == 0;
+  }
+
+  Iterator it = DfArray_Iterator_Create(array);
+
+  // Cast returned data structure to propper type
+  DfArray *filtered = (DfArray *)DfFilter(&it, isEven);
+  ```
   
 </details>
 
