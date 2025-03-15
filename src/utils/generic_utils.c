@@ -2,6 +2,7 @@
 #include "../../includes/df_utils.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 void *DfMap(Iterator *it, void *(*func)(void *element)) {
   void *new_ds = it->create_new(it);
@@ -34,4 +35,17 @@ void *DfFind(Iterator *it, bool (*func)(void *element)) {
     if(func(element)) return element;
   }
   return NULL;
+}
+
+void DfForEach(Iterator *it, void (*func)(void *element)) {
+  size_t size = it->elem_size(it);
+  void *copy = malloc(size);
+
+  while(it->has_next(it)) {
+    void *element = it->next(it);
+    memcpy(copy, element, size);
+    func(copy);
+  }
+
+  free(copy);
 }

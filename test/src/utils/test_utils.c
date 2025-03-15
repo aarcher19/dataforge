@@ -3,6 +3,7 @@
 #include <criterion/internal/assert.h>
 #include <criterion/internal/test.h>
 #include <criterion/logging.h>
+#include <stdio.h>
 #include "../includes/df_array.h"
 #include "../includes/df_iterator.h"
 #include "../includes/df_utils.h"
@@ -23,6 +24,10 @@ bool greater_than_10(void *element) {
 
 bool greater_than_30(void *element) {
   return *(int *)element > 30;
+}
+
+void print_num_plus_2(void *element) {
+  printf("%d", *(int *)element + 2);
 }
 
 
@@ -82,4 +87,25 @@ Test(generic_utils_suit, find_df_array) {
   Iterator_Destroy(&it);
   DfArray_Destroy(array);
   free(found);
+}
+
+// forEach tests
+
+Test(generic_utils_suit, for_each_df_array) {
+  DfArray *array = DfArray_Create(sizeof(int), 3);
+  int nums[] = {10, 23, 30};
+  for(int i = 0; i < 3; i++) {
+    DfArray_Push(array, &nums[i]);
+  }
+  Iterator it = DfArray_Iterator_Create(array);
+  int num;
+  DfArray_Get(array, 0, &num);
+  cr_assert(num == 10, "Expected num to equal 10");
+  DfForEach(&it, print_num_plus_2);
+  DfArray_Get(array, 0, &num);
+  cr_assert(num == 10, "Expected num to still equal 10");
+  Iterator_Destroy(&it);
+  DfArray_Destroy(array);
+  Iterator_Destroy(&it);
+  DfArray_Destroy(array);
 }

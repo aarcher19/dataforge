@@ -10,4 +10,6 @@ void *DfFilter(Iterator *it, bool (*func)(void *element));
 
 void *DfFind(Iterator *it, bool (*func)(void *element));
 
+void DfForEach(Iterator *it, void (*func)(void *element));
+
 #endif

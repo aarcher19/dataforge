@@ -219,6 +219,11 @@ void DfArray_Insert_New(void *new_ds, void *element) {
   DfArray_Push(arr, element);
 }
 
+size_t DfArray_Elem_Size(Iterator *it) {
+  DfArray *array =(DfArray *)it->structure;
+  return array->elem_size;
+}
+
 Iterator DfArray_Iterator_Create(DfArray *array) {
   DfArray_Iterator *it = malloc(sizeof(DfArray_Iterator));
   it->array = array;
@@ -230,7 +235,8 @@ Iterator DfArray_Iterator_Create(DfArray *array) {
     .next = DfArray_Iterator_Next,
     .has_next = DfArray_Iterator_Has_Next,
     .create_new = DfArray_Create_New,
-    .insert_new = DfArray_Insert_New
+    .insert_new = DfArray_Insert_New,
+    .elem_size = DfArray_Elem_Size
   };
 }
 
