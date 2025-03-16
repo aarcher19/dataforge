@@ -204,6 +204,25 @@ if (found != NULL) {
   printf("No element found");
 }
 ```
+
+### `void DfForEach(Iterator *it, void (*func)(void *element))`
+DfForEach takes an iterator and a function pointer as parameters. It iterates through any data structure and applies the provided function to each element. It does not return anything nor does it modify the original data structure.
+
+### Usage
+```c
+DfArray *array = DfArray_Create(sizeof(int), 3);
+int nums[] = {10, 23, 30};
+for(int i = 0; i < 3; i++){
+    DfArray_Push(array, &nums[i]);
+}
+
+void print_num_plus_2(void *element) {
+  printf("%d\n", *(int *)element + 2);
+}
+
+Iterator it = DfArray_Iterator_Create(array);
+DfForEach(&it, print_num_plus_2);
+```
 </details>
 
 ## Contributing
