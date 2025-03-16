@@ -131,6 +131,10 @@ DataForge is a lightweight and extensible C library that provides high-level con
 </details>
 
 ## Utils
+Data Forge uses a monolithic utils header for ease of use. To use any utility function include df_utils.h in your file as shown below.
+```c
+#include <dataforge/df_utils.h>
+```
 
 <details>
   <summary><strong>Generic - Can be used with any data structure</strong></summary>
