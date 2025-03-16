@@ -27,9 +27,8 @@ bool greater_than_30(void *element) {
 }
 
 void print_num_plus_2(void *element) {
-  printf("%d", *(int *)element + 2);
+  printf("%d\n", *(int *)element + 2);
 }
-
 
 // map tests
 
@@ -104,8 +103,6 @@ Test(generic_utils_suit, for_each_df_array) {
   DfForEach(&it, print_num_plus_2);
   DfArray_Get(array, 0, &num);
   cr_assert(num == 10, "Expected num to still equal 10");
-  Iterator_Destroy(&it);
-  DfArray_Destroy(array);
   Iterator_Destroy(&it);
   DfArray_Destroy(array);
 }
