@@ -106,3 +106,18 @@ Test(generic_utils_suit, for_each_df_array) {
   Iterator_Destroy(&it);
   DfArray_Destroy(array);
 }
+
+// count tests
+
+Test(generic_utils_suit, count_df_array) {
+  DfArray *array = DfArray_Create(sizeof(int), 3);
+  int nums[] = {10, 23, 30};
+  for(int i = 0; i < 3; i++) {
+    DfArray_Push(array, &nums[i]);
+  }
+  Iterator it = DfArray_Iterator_Create(array);
+  size_t count = DfCount(&it, isEven);
+  cr_assert(count == 2, "Expected count to be equal to 2");
+  Iterator_Destroy(&it);
+  DfArray_Destroy(array);
+}

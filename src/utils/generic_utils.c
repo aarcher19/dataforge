@@ -49,3 +49,14 @@ void DfForEach(Iterator *it, void (*func)(void *element)) {
 
   free(copy);
 }
+
+size_t DfCount(Iterator *it, bool (*func)(void *element)) {
+  size_t count = 0;
+  
+  while(it->has_next(it)) {
+    void *element = it->next(it);
+    if(func(element)) count ++;
+  }
+
+  return count;
+}
