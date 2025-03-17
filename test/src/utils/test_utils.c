@@ -4,9 +4,9 @@
 #include <criterion/internal/test.h>
 #include <criterion/logging.h>
 #include <stdio.h>
-#include "../includes/df_array.h"
-#include "../includes/df_iterator.h"
-#include "../includes/df_utils.h"
+#include "../../../includes/df_array.h"
+#include "../../../includes/df_iterator.h"
+#include "../../../includes/df_utils.h"
 
 // Helper funcs
 void *double_value2(void *element) {
