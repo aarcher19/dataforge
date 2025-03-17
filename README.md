@@ -227,6 +227,25 @@ void print_num_plus_2(void *element) {
 Iterator it = DfArray_Iterator_Create(array);
 DfForEach(&it, print_num_plus_2);
 ```
+
+### `size_t DfCount(Iterator *it, bool (*func)(void *element))`
+DfCount takes an iterator and a function pointer as parameters. It iterates through any data structure and applies the passed in comparison function to each element to see if the element satisfies a condition, if the function returns true a count is incremented. The final count is then returned.
+
+### Usage
+```c
+DfArray *array = DfArray_Create(sizeof(int), 3);
+int nums[] = {10, 23, 30};
+for(int i = 0; i < 3; i++){
+    DfArray_Push(array, &nums[i]);
+}
+
+bool isEven(void *element) {
+    return *(int *)element % 2 == 0;
+}
+
+Iterator it = DfArray_Iterator_Create(array);
+size_t count = DfCount(&it, isEven);
+```
 </details>
 
 ## Contributing
