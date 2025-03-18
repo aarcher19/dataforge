@@ -30,30 +30,30 @@ Data Forge is a lightweight and extensible C library that provides high-level co
   ```c
   int num = 10;
   DfArray_Set(array, 1, &num);
-  int retrieved;
-  DfArray_Get(array, 1, &retrieved);
-  printf("Retrieved value: %d\n", retrieved);
+  int *retrieved = (int *)DfArray_Get(array, 1);
+  printf("Retrieved value: %d\n", *retrieved);
+  free(retrieved);
   ```
   
   #### Adding and Removing Elements
   ```c
   int value = 42;
   DfArray_Push(array, &value);
-  int popped;
-  DfArray_Pop(array, &popped);
-  printf("Popped value: %d\n", popped);
+  int *popped = (int *)DfArray_Pop(array);
+  printf("Popped value: %d\n", *popped);
+  free(popped);
   
   int value2 = 25;
   DfArray_Unshift(array, &value2);
-  int shifted;
-  DfArray_Shift(array, &shifted);
-  printf("Shifted value: %d\n", shifted);
+  int *shifted = (int *)DfArray_Shift(array);
+  printf("Shifted value: %d\n", *shifted);
+  free(shifted);
   
   int value3 = 30;
   DfArray_InsertAt(array, 1, &value3);
-  int inserted;
-  DfArray_Get(array, 1, &inserted);
-  printf("Inserted value: %d\n", inserted);
+  int *inserted = (int *)DfArray_Get(array, 1);
+  printf("Inserted value: %d\n", *inserted);
+  free(inserted);
   DfArray_RemoveAt(array, 1);
   ```
   #### Iteration
@@ -94,19 +94,19 @@ Data Forge is a lightweight and extensible C library that provides high-level co
   #### `void DfArray_Push(DfArray* array, void *value)`
   Adds an element to the end, resizing if needed.
   
-  #### `void DfArray_Pop(DfArray* array, void *dest)`
+  #### `void *DfArray_Pop(DfArray* array)`
   Removes and retrieves the last element.
   
   #### `void DfArray_Unshift(DfArray* array, void *value)`
   Adds an element to the front, resizing if needed.
   
-  #### `void DfArray_Shift(DfArray* array, void *dest)`
+  #### `void *DfArray_Shift(DfArray* array)`
   Removes and retrieves the first element.
   
   #### `void DfArray_Set(DfArray* array, size_t index, void *value)`
   Updates a given element at a specified index.
   
-  #### `void DfArray_Get(DfArray* array, size_t index, void *dest)`
+  #### `void *DfArray_Get(DfArray* array, size_t index)`
   Retrieves an element with bounds checking.
   
   #### `void DfArray_InsertAt(DfArray* array, size_t index, void *value)`
