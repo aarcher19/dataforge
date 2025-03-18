@@ -47,10 +47,11 @@ Test(df_array_suit, shrink) {
   int val1 = 1, val2 = 2;
   DfArray_Push(array, &val1);
   DfArray_Push(array, &val2);
-  int dest;
-  DfArray_Pop(array, &dest);
+  int *dest = (int *)DfArray_Pop(array);
+  free(dest);
   cr_assert(array->capacity == array->length, "Expected capacity to match length");
-  DfArray_Shift(array, &dest);
+  dest = (int *)DfArray_Shift(array);
+  free(dest);
   cr_assert(array->length == 0, "Expected length to be 0 but it is %zu", array->length);
   cr_assert(array->items == NULL, "Expected items to be null");
   cr_assert(array->capacity == 0, "Expected capacity to be 0 but was %zu", array->capacity);
@@ -64,9 +65,9 @@ Test(df_array_suit, set) {
   DfArray_Push(array, &val2);
   int newVal = 30;
   DfArray_Set(array, 0, &newVal);
-  int check;
-  DfArray_Get(array, 0, &check);
-  cr_assert(check == 30, "Expected check to equal 30");
+  int *check = (int *)DfArray_Get(array, 0);
+  cr_assert(*check == 30, "Expected check to equal 30");
+  free(check);
   DfArray_Destroy(array);
 }
 
@@ -84,37 +85,45 @@ Test(df_array_suit, push) {
 
 Test(df_array_suit, get) {
   DfArray *array = DfArray_Create(sizeof(int), 3);
-  int val1 = 5, val2 = 15, val3 = 25, retrieved;
+  int val1 = 5, val2 = 15, val3 = 25;
+  int *retrieved;
   DfArray_Push(array, &val1);
   DfArray_Push(array, &val2);
   DfArray_Push(array, &val3);
-  DfArray_Get(array, 0, &retrieved);
-  cr_assert(retrieved == val1, "Expected retrieved to be equal to val1");
-  DfArray_Get(array, 1, &retrieved);
-  cr_assert(retrieved == val2, "Expected retrieved to be equal to val2");
-  DfArray_Get(array, 2, &retrieved);
-  cr_assert(retrieved == val3, "Expected retrieved to be equal to val3");
+  retrieved = (int *)DfArray_Get(array, 0);
+  cr_assert(*retrieved == val1, "Expected retrieved to be equal to val1");
+  free(retrieved);
+  retrieved = (int *)DfArray_Get(array, 1);
+  cr_assert(*retrieved == val2, "Expected retrieved to be equal to val2");
+  free(retrieved);
+  retrieved = (int *)DfArray_Get(array, 2);
+  cr_assert(*retrieved == val3, "Expected retrieved to be equal to val3");
+  free(retrieved);
   DfArray_Destroy(array);
 }
 
 Test(df_array_suit, pop) {
   DfArray *array = DfArray_Create(sizeof(int), 3);
-  int val1 = 100, val2 = 200, val3 = 300, retrieved;
+  int val1 = 100, val2 = 200, val3 = 300;
+  int *retrieved;
 
   DfArray_Push(array, &val1);
   DfArray_Push(array, &val2);
   DfArray_Push(array, &val3);
 
-  DfArray_Pop(array, &retrieved);
-  cr_assert(retrieved == val3, "Expected retrived to be equal to val3");
+  retrieved = (int *)DfArray_Pop(array);
+  cr_assert(*retrieved == val3, "Expected retrived to be equal to val3");
+  free(retrieved);
   cr_assert(array->length == 2, "Expected length to have decreased");
 
-  DfArray_Pop(array, &retrieved);
-  cr_assert(retrieved == val2, "Expected retrieved to be equal to val2");
+  retrieved = (int *)DfArray_Pop(array);
+  cr_assert(*retrieved == val2, "Expected retrieved to be equal to val2");
+  free(retrieved);
   cr_assert(array->length == 1, "Expected length to have decreased");
 
-  DfArray_Pop(array, &retrieved);
-  cr_assert(retrieved == val1, "Expected retrieved to be equal to val1");
+  retrieved = (int *)DfArray_Pop(array);
+  cr_assert(*retrieved == val1, "Expected retrieved to be equal to val1");
+  free(retrieved);
   cr_assert(array->length == 0, "Expected length to have decreased");
   DfArray_Destroy(array);
 }
@@ -125,9 +134,9 @@ Test(df_array_suit, shift) {
   for(int i = 0; i < 5; i++){
     DfArray_Push(array, &nums[i]);
   }
-  int first;
-  DfArray_Shift(array, &first);
-  cr_assert(first == 10, "Expected first to equel 10");
+  int *first = (int *)DfArray_Shift(array);
+  cr_assert(*first == 10, "Expected first to equel 10");
+  free(first);
   DfArray_Destroy(array);
 }
 
@@ -137,9 +146,8 @@ Test(df_array_suit, unshift) {
   for(int i = 0; i < 3; i++) {
     DfArray_Unshift(array, &nums[i]);
   }
-  int first;
-  DfArray_Shift(array, &first);
-  cr_assert(first == 30, "Expected first to equel 30 but is %d instead", first);
+  int *first = (int *)DfArray_Shift(array);
+  cr_assert(*first == 30, "Expected first to equel 30 but is %d instead", *first);
   DfArray_Destroy(array);
 }
 
@@ -151,14 +159,14 @@ Test(df_array_suit, insertAt) {
   }
   int num = 60;
   DfArray_InsertAt(array, 1, &num);
-  int retrived;
-  DfArray_Get(array, 1, &retrived);
-  cr_assert(retrived == num, "Expected retrived to be equel to num but got %d instead", retrived);
-  DfArray_InsertAt(array, 6, &retrived);
-  int popped;
-  DfArray_Pop(array, &popped);
-  cr_assert(popped == retrived, "Expected popped to be equel to retrieved");
+  int *retrieved = (int *)DfArray_Get(array, 1);
+  cr_assert(*retrieved == num, "Expected retrived to be equel to num but got %d instead", *retrieved);
+  DfArray_InsertAt(array, 6, retrieved);
+  int *popped = (int *)DfArray_Pop(array);
+  cr_assert(*popped == *retrieved, "Expected popped to be equel to retrieved");
   DfArray_Destroy(array);
+  free(popped);
+  free(retrieved);
 }
 
 Test(df_array_suit, removeAt) {
@@ -168,12 +176,13 @@ Test(df_array_suit, removeAt) {
     DfArray_Push(array, &nums[i]);
   }
   DfArray_RemoveAt(array, 3);
-  int num;
-  DfArray_Get(array, 3, &num);
-  cr_assert(num == 50, "Expected 40 to be removed and 50 to be in its place");
+  int *num = (int *)DfArray_Get(array, 3);
+  cr_assert(*num == 50, "Expected 40 to be removed and 50 to be in its place");
+  free(num);
   DfArray_RemoveAt(array, 3);
-  DfArray_Pop(array, &num);
-  cr_assert(num == 30, "Expected 50 to be removed and 30 to be popped off");
+  num = (int *)DfArray_Pop(array);
+  cr_assert(*num == 30, "Expected 50 to be removed and 30 to be popped off");
+  free(num);
   DfArray_Destroy(array);
 }
 
@@ -218,10 +227,12 @@ Test(df_array_suit, create_new_and_insert_new) {
     cr_assert_eq(new_array->length, original->length, "New array should have the same length as the original.");
 
     for (size_t i = 0; i < original->length; i++) {
-        int original_value, new_value;
-        DfArray_Get(original, i, &original_value);
-        DfArray_Get(new_array, i, &new_value);
-        cr_assert_eq(original_value, new_value, "Elements at index %zu should be equal in both arrays.", i);
+        int *original_value, *new_value;
+        original_value = (int *)DfArray_Get(original, i);
+        new_value = (int *)DfArray_Get(new_array, i);
+        cr_assert_eq(*original_value, *new_value, "Elements at index %zu should be equal in both arrays.", i);
+        free(original_value);
+        free(new_value);
     }
 
     DfArray_Destroy(original);
@@ -235,9 +246,9 @@ Test(df_array_suit, map) {
   }
   DfArray_Map(array, double_value);
   for (size_t i = 0; i < array->length; i++) {
-      int value;
-      DfArray_Get(array, i, &value);
-      cr_assert(value == (int)((i + 1) * 2), "Expected value to be doubled");  
+      int *value = (int *)DfArray_Get(array, i);
+      cr_assert(*value == (int)((i + 1) * 2), "Expected value to be doubled");
+      free(value);
   }
   DfArray_Destroy(array);
 }

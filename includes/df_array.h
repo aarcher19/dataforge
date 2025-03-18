@@ -18,13 +18,13 @@ DfArray* DfArray_Create(size_t elem_size, size_t initial_capcity);
 
 void DfArray_Destroy(DfArray* array);
 
-void DfArray_Get(DfArray* array, size_t index, void *dest);
+void *DfArray_Get(DfArray* array, size_t index);
 
 void DfArray_Push(DfArray* array, void *value);
 
-void DfArray_Pop(DfArray* array, void *dest);
+void *DfArray_Pop(DfArray* array);
 
-void DfArray_Shift(DfArray* array, void *dest);
+void *DfArray_Shift(DfArray* array);
 
 void DfArray_Unshift(DfArray* array, void *value);
 

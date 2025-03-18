@@ -72,13 +72,16 @@ void DfArray_Shrink(DfArray* array) {
   }
 }
 
-void DfArray_Get(DfArray *array, size_t index, void *dest) {
+void *DfArray_Get(DfArray *array, size_t index) {
+  void *dest = malloc(array->elem_size);
   if (index < array->length) {
     memcpy(dest, (char *)array->items + index * array->elem_size, array->elem_size);
   } else {
     fprintf(stderr, "Error: Index %zu out of bounds (length: %zu)\n", index, array->length);
     exit(1);
   }
+
+  return dest;
 }
 
 void DfArray_Set(DfArray *array, size_t index, void *value) {
@@ -99,7 +102,8 @@ void DfArray_Push(DfArray* array, void *value) {
   array->length++;
 }
 
-void DfArray_Pop(DfArray *array, void *dest) {
+void *DfArray_Pop(DfArray *array) {
+  void *dest = malloc(array->elem_size);
   if (array->length < 1) {
     fprintf(stderr, "Error: Array is empty, can not pop\n");
     exit(1);
@@ -110,10 +114,14 @@ void DfArray_Pop(DfArray *array, void *dest) {
     if (array->length <= array->capacity/2 || array->length == 0) {
       DfArray_Shrink(array);
     }
+
+    return dest;
   }
 }
 
-void DfArray_Shift(DfArray* array, void *dest) {
+void *DfArray_Shift(DfArray* array) {
+  void *dest = malloc(array->elem_size);
+
   if (array->length == 0) {
     fprintf(stderr, "Error: Cannot shift from an empty array\n");
     exit(1);
@@ -125,6 +133,8 @@ void DfArray_Shift(DfArray* array, void *dest) {
   if (array->length <= array->capacity/2 || array->length == 0) {
     DfArray_Shrink(array);
   }
+
+  return dest;
 }
 
 void DfArray_Unshift(DfArray* array, void *value) {

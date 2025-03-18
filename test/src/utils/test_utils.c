@@ -60,11 +60,13 @@ Test(generic_utils_suit, filter_df_array) {
   }
   Iterator it = DfArray_Iterator_Create(array);
   DfArray *filtered = (DfArray *)DfFilter(&it, isEven);
-  int num;
-  DfArray_Get(filtered, 0, &num); 
-  cr_assert(num == 10, "Expected num to equal 10");
-  DfArray_Get(filtered, 1, &num); 
-  cr_assert(num == 30, "Expected num to equal 10");
+  int *num;
+  num = (int *)DfArray_Get(filtered, 0); 
+  cr_assert(*num == 10, "Expected num to equal 10");
+  free(num);
+  num = (int *)DfArray_Get(filtered, 1); 
+  cr_assert(*num == 30, "Expected num to equal 10");
+  free(num);
   Iterator_Destroy(&it);
   DfArray_Destroy(array);
   DfArray_Destroy(filtered);
@@ -97,12 +99,14 @@ Test(generic_utils_suit, for_each_df_array) {
     DfArray_Push(array, &nums[i]);
   }
   Iterator it = DfArray_Iterator_Create(array);
-  int num;
-  DfArray_Get(array, 0, &num);
-  cr_assert(num == 10, "Expected num to equal 10");
+  int *num;
+  num = (int *)DfArray_Get(array, 0);
+  cr_assert(*num == 10, "Expected num to equal 10");
+  free(num);
   DfForEach(&it, print_num_plus_2);
-  DfArray_Get(array, 0, &num);
-  cr_assert(num == 10, "Expected num to still equal 10");
+  num = (int *)DfArray_Get(array, 0);
+  cr_assert(*num == 10, "Expected num to still equal 10");
+  free(num);
   Iterator_Destroy(&it);
   DfArray_Destroy(array);
 }
