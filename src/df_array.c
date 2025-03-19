@@ -42,8 +42,16 @@ void DfArray_Destroy(DfArray* array) {
 }
 
 void DfArray_Resize(DfArray* array) {
-  size_t new_capacity = array->capacity * 2;
-  void *resized_items = realloc(array->items, new_capacity * array->elem_size);
+  size_t new_capacity;
+  void *resized_items;
+  if (array->capacity == 0) {
+    new_capacity = 5;
+    resized_items = malloc(new_capacity * array->elem_size);
+  } else {
+    new_capacity = array->capacity * 2;
+    resized_items = realloc(array->items, new_capacity * array->elem_size);
+  }
+  
   if(!resized_items) {
     perror("Reallocation of IntArray->capacity failed");
     return;
