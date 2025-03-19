@@ -64,32 +64,30 @@ void DfArray_Shrink(DfArray* array) {
   size_t new_capacity = array->length;
   void *shrunk_items = realloc(array->items, new_capacity * array->elem_size);
 
-  if (shrunk_items) {
-    array->items = shrunk_items;
-    array->capacity = new_capacity;
-  } else {
+  if (!shrunk_items) {
     perror("Realloc failed in dfArray_Shrink.");
   }
+
+  array->items = shrunk_items;
+  array->capacity = new_capacity;
 }
 
 void *DfArray_Get(DfArray *array, size_t index) {
-  if (index < array->length) {
-    void *dest = malloc(array->elem_size);
-    memcpy(dest, (char *)array->items + index * array->elem_size, array->elem_size);
-    return dest;
-  } else {
+  if (index >= array->length) {
     fprintf(stderr, "Error: Index %zu out of bounds (length: %zu)\n", index, array->length);
     exit(1);
   }
+  void *dest = malloc(array->elem_size);
+  memcpy(dest, (char *)array->items + index * array->elem_size, array->elem_size);
+  return dest;
 }
 
 void DfArray_Set(DfArray *array, size_t index, void *value) {
-  if (index < array->length) {
-    memcpy((char *)array->items + index * array->elem_size, value, array->elem_size);
-  } else {
+  if (index >= array->length) {
     fprintf(stderr, "Error: Index %zu out of bounds (length: %zu)\n", index, array->length);
     exit(1);
   }
+  memcpy((char *)array->items + index * array->elem_size, value, array->elem_size);
 }
 
 void DfArray_Push(DfArray* array, void *value) {
@@ -105,17 +103,16 @@ void *DfArray_Pop(DfArray *array) {
   if (array->length < 1) {
     fprintf(stderr, "Error: Array is empty, can not pop\n");
     exit(1);
-  } else {
-    void *dest = malloc(array->elem_size);
-    memcpy(dest, (char *)array->items + (array->length - 1) * array->elem_size, array->elem_size);
-    array->length--;
+  } 
+  void *dest = malloc(array->elem_size);
+  memcpy(dest, (char *)array->items + (array->length - 1) * array->elem_size, array->elem_size);
+  array->length--;
 
-    if (array->length <= array->capacity/2 || array->length == 0) {
-      DfArray_Shrink(array);
-    }
-
-    return dest;
+  if (array->length <= array->capacity/2 || array->length == 0) {
+    DfArray_Shrink(array);
   }
+
+  return dest;
 }
 
 void *DfArray_Shift(DfArray* array) {
