@@ -11,6 +11,7 @@ typedef struct Iterator {
     void *(*create_new)(struct Iterator *);          // Function to create new empty instance of ds
     void (*insert_new)(void *new_ds, void *element); // Function to insert new element into datastructure
     size_t (*elem_size)(struct Iterator *);
+    void (*free_all)(struct Iterator *);
 } Iterator;
 
 void Iterator_Destroy(Iterator *it);

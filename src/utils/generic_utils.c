@@ -60,3 +60,16 @@ size_t DfCount(Iterator *it, bool (*func)(void *element)) {
 
   return count;
 }
+
+void *DfReduce(Iterator *it, void *initial, void (*func)(void *accumulator, void *element)) {
+  size_t size = it->elem_size(it);
+  void *result = malloc(size);
+  memcpy(result, initial, size);
+
+  while(it->has_next(it)) {
+    void *element = it->next(it);
+    func(result, element);
+  }
+
+  return result;
+}

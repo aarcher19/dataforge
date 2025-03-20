@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -237,6 +238,14 @@ size_t DfArray_Elem_Size(Iterator *it) {
   return array->elem_size;
 }
 
+void DfArray_Free_All(Iterator *it) {
+  DfArray *array = (DfArray *)it->structure;
+  free(array->items);
+  array->items = NULL;
+  array->capacity = 0;
+  array->length = 0;
+}
+
 Iterator DfArray_Iterator_Create(DfArray *array) {
   DfArray_Iterator *it = malloc(sizeof(DfArray_Iterator));
   it->array = array;
@@ -249,7 +258,8 @@ Iterator DfArray_Iterator_Create(DfArray *array) {
     .has_next = DfArray_Iterator_Has_Next,
     .create_new = DfArray_Create_New,
     .insert_new = DfArray_Insert_New,
-    .elem_size = DfArray_Elem_Size
+    .elem_size = DfArray_Elem_Size,
+    .free_all = DfArray_Free_All
   };
 }
 
