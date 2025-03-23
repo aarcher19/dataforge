@@ -246,6 +246,31 @@ bool isEven(void *element) {
 Iterator it = DfArray_Iterator_Create(array);
 size_t count = DfCount(&it, isEven);
 ```
+
+### `void *DfReduce(Iterator *it, void *initial, void (*func)(void *accumulator, void *element))`
+DfReduce takes a pointer to an interator, pointer to an initial value and a function pointer as parameters. It iterates through any data structure and applies the function to every element in the data structure and returns the reduced value.
+
+### Usage
+```c
+  DfArray *array = DfArray_Create(sizeof(int), 3);
+  int nums[] = {10, 23, 30};
+  for(int i = 0; i < 3; i++) {
+    DfArray_Push(array, &nums[i]);
+  }
+  Iterator it = DfArray_Iterator_Create(array);
+
+  void sum_int(void *acc, void *elem) {
+    *(int *)acc += *(int *)elem;
+  }
+
+  int initial = 0;
+  int *reduced = (int *)DfReduce(&it, &initial, sum_int);
+  printf("Reduced: %d", *reduced);
+
+  free(reduced);
+  Iterator_Destroy(&it);
+  DfArray_Destroy(array);
+```
 </details>
 
 ## Contributing
