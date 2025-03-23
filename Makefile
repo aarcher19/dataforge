@@ -28,7 +28,8 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 clean:
-	rm -rf $(BUILD_DIR)/*.o $(LIB_NAME)
+	rm -rf $(BUILD_DIR)/*.o* $(LIB_NAME)
+	rm -rf $(BUILD_DIR)/utils/*.o*
 
 INSTALL_INCLUDE_DIR = /usr/local/include/dataforge  
 INSTALL_LIB_DIR = /usr/local/lib

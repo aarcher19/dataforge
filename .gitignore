@@ -1,5 +1,6 @@
-/build/
-*.o
-
-.cache
+build/*.o*
+build/utils/*.o*
+lib/*.so
+.cache/
+test/bin/*.o
 compile_commands.json
