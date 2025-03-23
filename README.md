@@ -276,7 +276,7 @@ DfReduce takes a pointer to an interator, pointer to an initial value and a func
 DfFreeAll takes an iterator pointer as a parameter. It frees all elements in the data structure from memory without freeing the data structure struct itself allowing you to continue using the now empty data structure.
 
 ### Usage
-```
+```c
   DfArray *array = DfArray_Create(sizeof(int), 3);
   int nums[] = {10, 23, 30};
   for(int i = 0; i < 3; i++) {
