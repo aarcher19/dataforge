@@ -73,3 +73,7 @@ void *DfReduce(Iterator *it, void *initial, void (*func)(void *accumulator, void
 
   return result;
 }
+
+void DfFreeAll(Iterator *it) {
+  it->free_all(it);
+}

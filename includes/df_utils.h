@@ -16,4 +16,6 @@ size_t DfCount(Iterator *it, bool (*func)(void *element));
 
 void *DfReduce(Iterator *it, void *initial, void (*func)(void *accumulator, void *element));
 
+void DfFreeAll(Iterator *it);
+
 #endif

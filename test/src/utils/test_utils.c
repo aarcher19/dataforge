@@ -30,6 +30,17 @@ void print_num_plus_2(void *element) {
   printf("%d\n", *(int *)element + 2);
 }
 
+void sum_int(void *acc, void *elem) {
+    *(int *)acc += *(int *)elem;
+}
+
+typedef struct DfArray {
+  void *items;
+  size_t length;
+  size_t elem_size;
+  size_t capacity;
+} DfArray;
+
 // map tests
 
 Test(generic_utils_suit, map_df_array) {
@@ -125,3 +136,34 @@ Test(generic_utils_suit, count_df_array) {
   Iterator_Destroy(&it);
   DfArray_Destroy(array);
 }
+
+Test(generic_utils_suit, reduce_df_array) {
+  DfArray *array = DfArray_Create(sizeof(int), 3);
+  int nums[] = {10, 23, 30};
+  for(int i = 0; i < 3; i++) {
+    DfArray_Push(array, &nums[i]);
+  }
+  Iterator it = DfArray_Iterator_Create(array);
+  int initial = 0;
+  int *reduced = (int *)DfReduce(&it, &initial, sum_int);
+  cr_assert(*reduced == 63, "Expected reduced sum to be 63");
+  free(reduced);
+  Iterator_Destroy(&it);
+  DfArray_Destroy(array);
+}
+
+Test(generic_utils_suit, free_all_df_array) {
+  DfArray *array = DfArray_Create(sizeof(int), 3);
+  int nums[] = {10, 23, 30};
+  for(int i = 0; i < 3; i++) {
+    DfArray_Push(array, &nums[i]);
+  }
+  Iterator it = DfArray_Iterator_Create(array);
+  DfFreeAll(&it);
+  DfArray *test = (DfArray *)it.structure;
+  cr_assert(test->items == NULL);
+  Iterator_Destroy(&it);
+  DfArray_Destroy(array);
+}
+
+
