@@ -129,6 +129,31 @@ Data Forge is a lightweight and extensible C library that provides high-level co
   
   </details>  
 </details>
+<details>
+  <summary><strong>DfList_S - Singly Linked List</strong></summary>
+
+  ### DfList_S
+  DfList_S is a lightweight, dynamic singly linked list that provides high-level and memory safe functionality with generic type storage.
+
+  ### Features
+  - **Dynamic & Generic** – Stores any data type using void *
+  - **Insertion** – Add elements at the front, back, or a specific index.
+  - **Deletion** – Remove elements from the front, back, or a specific index.
+  - **Access & Lookup** – Retrieve elements by index, find values with a comparator.
+  - **Iteration** - Iterate sequentially through all elements.
+  - **Safe Memory Management** – Custom cleanup function for freeing stored data.
+
+<details>
+    <summary><strong>Usage</strong></summary>
+</details>
+
+<details>
+    <summary><strong>API Reference</strong></summary>
+
+  #### `void DfList_S_Destroy(DfList_S *list, void (*cleanup)(void *element))`
+  Free's a DfList_S struct and nodes. Allows user to pass cleanup function that determines how the elements stored in the linked list are free'd. 
+</details>
+</details>
 
 ## Utils
 Data Forge uses a monolithic utils header for ease of use. To use any utility function include df_utils.h in your file as shown below.
