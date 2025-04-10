@@ -4,10 +4,12 @@
 #include <stdbool.h>
 #include <string.h>
 
-void *DfMap(Iterator *it, void *(*func)(void *element)) {
+void *df_map(Iterator *it, void *(*func)(void *element))
+{
   void *new_ds = it->create_new(it);
 
-  while(it->has_next(it)) {
+  while (it->has_next(it))
+  {
     void *element = it->next(it);
     void *modified_element = func(element);
 
@@ -17,31 +19,39 @@ void *DfMap(Iterator *it, void *(*func)(void *element)) {
   return new_ds;
 }
 
-void *DfFilter(Iterator *it, bool (*func)(void *element)) {
+void *df_filter(Iterator *it, bool (*func)(void *element))
+{
   void *filtered_ds = it->create_new(it);
 
-  while(it->has_next(it)) {
+  while (it->has_next(it))
+  {
     void *element = it->next(it);
 
-    if(func(element)) it->insert_new(filtered_ds, element);
+    if (func(element))
+      it->insert_new(filtered_ds, element);
   }
   return filtered_ds;
 }
 
-void *DfFind(Iterator *it, bool (*func)(void *element)) {
+void *df_find(Iterator *it, bool (*func)(void *element))
+{
   void *element;
-  while(it->has_next(it)) {
+  while (it->has_next(it))
+  {
     element = it->next(it);
-    if(func(element)) return element;
+    if (func(element))
+      return element;
   }
   return NULL;
 }
 
-void DfForEach(Iterator *it, void (*func)(void *element)) {
+void df_for_each(Iterator *it, void (*func)(void *element))
+{
   size_t size = it->elem_size(it);
   void *copy = malloc(size);
 
-  while(it->has_next(it)) {
+  while (it->has_next(it))
+  {
     void *element = it->next(it);
     memcpy(copy, element, size);
     func(copy);
@@ -50,23 +60,28 @@ void DfForEach(Iterator *it, void (*func)(void *element)) {
   free(copy);
 }
 
-size_t DfCount(Iterator *it, bool (*func)(void *element)) {
+size_t df_count(Iterator *it, bool (*func)(void *element))
+{
   size_t count = 0;
-  
-  while(it->has_next(it)) {
+
+  while (it->has_next(it))
+  {
     void *element = it->next(it);
-    if(func(element)) count ++;
+    if (func(element))
+      count++;
   }
 
   return count;
 }
 
-void *DfReduce(Iterator *it, void *initial, void (*func)(void *accumulator, void *element)) {
+void *df_reduce(Iterator *it, void *initial, void (*func)(void *accumulator, void *element))
+{
   size_t size = it->elem_size(it);
   void *result = malloc(size);
   memcpy(result, initial, size);
 
-  while(it->has_next(it)) {
+  while (it->has_next(it))
+  {
     void *element = it->next(it);
     func(result, element);
   }
@@ -74,6 +89,7 @@ void *DfReduce(Iterator *it, void *initial, void (*func)(void *accumulator, void
   return result;
 }
 
-void DfFreeAll(Iterator *it) {
+void df_free_all(Iterator *it)
+{
   it->free_all(it);
 }
