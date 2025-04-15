@@ -238,183 +238,285 @@ Data Forge uses a monolithic utils header for ease of use. To use any utility fu
 ```
 
 
+
 <details>
   <summary><strong>Generic - Can be used with any data structure</strong></summary>
 
-### `void *df_map(Iterator *it, void *(*func)(void *element))`
+### `DfResult df_map(Iterator *it, void *(*func)(void *element))`
 
 `df_map` takes an iterator and a function pointer as arguments. It iterates over any data structure, applies the provided function to each element, and returns a new data structure containing the modified elements.
 
 #### Usage
 ```c
-DfArray *array = dfarray_create(sizeof(int), 3);
-int nums[] = {10, 20, 30};
-for (int i = 0; i < 3; i++) {
-  dfarray_push(array, &nums[i]);
+DfResult res = dfarray_create(sizeof(int), 3);
+if (res.error) {
+  // Handle error
+} else {
+  DfArray *array = (DfArray *)res.value;
+  int nums[] = {10, 20, 30};
+  for (int i = 0; i < 3; i++) {
+    dfarray_push(array, &nums[i]);
+  }
+
+  void *double_element(void *element) {
+    int *value = (int *)element;
+    int *modified = malloc(sizeof(int));
+    *modified = (*value) * 2;
+    return modified;
+  }
+
+  DfResult it_res = dfarray_iterator_create(array);
+  if (it_res.error) {
+    // Handle error
+  } else {
+    Iterator it = *(Iterator *)it_res.value;
+
+    // Cast returned data structure to proper type
+    DfResult map_res = df_map(&it, double_element);
+    if (map_res.error) {
+      // Handle error
+    } else {
+      DfArray *new_array = (DfArray *)map_res.value;
+      // Use new_array
+    }
+  }
 }
-
-void *double_element(void *element) {
-  int *value = (int *)element;
-  int *modified = malloc(sizeof(int));
-  *modified = (*value) * 2;
-  return modified;
-}
-
-Iterator it = dfarray_iterator_create(array);
-
-// Cast returned data structure to proper type
-DfArray *new_array = (DfArray *)df_map(&it, double_element);
 ```
 
 ---
 
-### `void *df_filter(Iterator *it, bool (*func)(void *element))`
+### `DfResult df_filter(Iterator *it, bool (*func)(void *element))`
 
 `df_filter` takes an iterator and a boolean function pointer. It returns a new data structure containing only the elements that satisfy the condition in the provided function.
 
 #### Usage
 ```c
-DfArray *array = dfarray_create(sizeof(int), 3);
-int nums[] = {10, 23, 30};
-for (int i = 0; i < 3; i++) {
-  dfarray_push(array, &nums[i]);
+DfResult res = dfarray_create(sizeof(int), 3);
+if (res.error) {
+  // Handle error
+} else {
+  DfArray *array = (DfArray *)res.value;
+  int nums[] = {10, 23, 30};
+  for (int i = 0; i < 3; i++) {
+    dfarray_push(array, &nums[i]);
+  }
+
+  bool is_even(void *element) {
+    return *(int *)element % 2 == 0;
+  }
+
+  DfResult it_res = dfarray_iterator_create(array);
+  if (it_res.error) {
+    // Handle error
+  } else {
+    Iterator it = *(Iterator *)it_res.value;
+
+    // Cast returned data structure to proper type
+    DfResult filter_res = df_filter(&it, is_even);
+    if (filter_res.error) {
+      // Handle error
+    } else {
+      DfArray *filtered = (DfArray *)filter_res.value;
+      // Use filtered
+    }
+  }
 }
-
-bool is_even(void *element) {
-  return *(int *)element % 2 == 0;
-}
-
-Iterator it = dfarray_iterator_create(array);
-
-// Cast returned data structure to proper type
-DfArray *filtered = (DfArray *)df_filter(&it, is_even);
 ```
 
 ---
 
-### `void *df_find(Iterator *it, bool (*func)(void *element))`
+### `DfResult df_find(Iterator *it, bool (*func)(void *element))`
 
 `df_find` searches through a data structure and returns the first element that satisfies the condition specified in the provided function.
 
 #### Usage
 ```c
-DfArray *array = dfarray_create(sizeof(int), 3);
-int nums[] = {10, 23, 30};
-for (int i = 0; i < 3; i++) {
-  dfarray_push(array, &nums[i]);
-}
-
-bool greater_than_10(void *element) {
-  return *(int *)element > 10;
-}
-
-Iterator it = dfarray_iterator_create(array);
-void *found = df_find(&it, greater_than_10);
-
-if (found != NULL) {
-  printf("Found element: %d", *(int *)found);
+DfResult res = dfarray_create(sizeof(int), 3);
+if (res.error) {
+  // Handle error
 } else {
-  printf("No element found");
+  DfArray *array = (DfArray *)res.value;
+  int nums[] = {10, 23, 30};
+  for (int i = 0; i < 3; i++) {
+    dfarray_push(array, &nums[i]);
+  }
+
+  bool greater_than_10(void *element) {
+    return *(int *)element > 10;
+  }
+
+  DfResult it_res = dfarray_iterator_create(array);
+  if (it_res.error) {
+    // Handle error
+  } else {
+    Iterator it = *(Iterator *)it_res.value;
+    DfResult find_res = df_find(&it, greater_than_10);
+
+    if (find_res.error) {
+      // Handle error
+    } else {
+      int *found = (int *)find_res.value;
+      printf("Found element: %d", *found);
+    }
+  }
 }
 ```
 
 ---
 
-### `void df_for_each(Iterator *it, void (*func)(void *element))`
+### `DfResult df_for_each(Iterator *it, void (*func)(void *element))`
 
 `df_for_each` applies a function to every element in the data structure without modifying the structure or returning a value.
 
 #### Usage
 ```c
-DfArray *array = dfarray_create(sizeof(int), 3);
-int nums[] = {10, 23, 30};
-for (int i = 0; i < 3; i++) {
-  dfarray_push(array, &nums[i]);
-}
+DfResult res = dfarray_create(sizeof(int), 3);
+if (res.error) {
+  // Handle error
+} else {
+  DfArray *array = (DfArray *)res.value;
+  int nums[] = {10, 23, 30};
+  for (int i = 0; i < 3; i++) {
+    dfarray_push(array, &nums[i]);
+  }
 
-void print_plus_two(void *element) {
-  printf("%d\n", *(int *)element + 2);
-}
+  void print_plus_two(void *element) {
+    printf("%d
+", *(int *)element + 2);
+  }
 
-Iterator it = dfarray_iterator_create(array);
-df_for_each(&it, print_plus_two);
+  DfResult it_res = dfarray_iterator_create(array);
+  if (it_res.error) {
+    // Handle error
+  } else {
+    Iterator it = *(Iterator *)it_res.value;
+    DfResult for_each_res = df_for_each(&it, print_plus_two);
+
+    if (for_each_res.error) {
+      // Handle error
+    }
+  }
+}
 ```
 
 ---
 
-### `size_t df_count(Iterator *it, bool (*func)(void *element))`
+### `DfResult df_count(Iterator *it, bool (*func)(void *element))`
 
 `df_count` returns the number of elements in the data structure that satisfy the given condition function.
 
 #### Usage
 ```c
-DfArray *array = dfarray_create(sizeof(int), 3);
-int nums[] = {10, 23, 30};
-for (int i = 0; i < 3; i++) {
-  dfarray_push(array, &nums[i]);
-}
+DfResult res = dfarray_create(sizeof(int), 3);
+if (res.error) {
+  // Handle error
+} else {
+  DfArray *array = (DfArray *)res.value;
+  int nums[] = {10, 23, 30};
+  for (int i = 0; i < 3; i++) {
+    dfarray_push(array, &nums[i]);
+  }
 
-bool is_even(void *element) {
-  return *(int *)element % 2 == 0;
-}
+  bool is_even(void *element) {
+    return *(int *)element % 2 == 0;
+  }
 
-Iterator it = dfarray_iterator_create(array);
-size_t count = df_count(&it, is_even);
-printf("Count: %zu", count);
+  DfResult it_res = dfarray_iterator_create(array);
+  if (it_res.error) {
+    // Handle error
+  } else {
+    Iterator it = *(Iterator *)it_res.value;
+    DfResult count_res = df_count(&it, is_even);
+
+    if (count_res.error) {
+      // Handle error
+    } else {
+      size_t count = *(size_t *)count_res.value;
+      printf("Count: %zu", count);
+    }
+  }
+}
 ```
 
 ---
 
-### `void *df_reduce(Iterator *it, void *initial, void (*func)(void *accumulator, void *element))`
+### `DfResult df_reduce(Iterator *it, void *initial, void (*func)(void *accumulator, void *element))`
 
 `df_reduce` takes an iterator, an initial value, and a reducer function. It combines all elements into a single result based on the reducer logic.
 
 #### Usage
 ```c
-DfArray *array = dfarray_create(sizeof(int), 3);
-int nums[] = {10, 23, 30};
-for (int i = 0; i < 3; i++) {
-  dfarray_push(array, &nums[i]);
+DfResult res = dfarray_create(sizeof(int), 3);
+if (res.error) {
+  // Handle error
+} else {
+  DfArray *array = (DfArray *)res.value;
+  int nums[] = {10, 23, 30};
+  for (int i = 0; i < 3; i++) {
+    dfarray_push(array, &nums[i]);
+  }
+
+  void sum_int(void *acc, void *elem) {
+    *(int *)acc += *(int *)elem;
+  }
+
+  DfResult it_res = dfarray_iterator_create(array);
+  if (it_res.error) {
+    // Handle error
+  } else {
+    Iterator it = *(Iterator *)it_res.value;
+    int initial = 0;
+
+    DfResult reduce_res = df_reduce(&it, &initial, sum_int);
+    if (reduce_res.error) {
+      // Handle error
+    } else {
+      int *reduced = (int *)reduce_res.value;
+      printf("Reduced value: %d", *reduced);
+
+      free(reduced);
+    }
+  }
 }
-
-void sum_int(void *acc, void *elem) {
-  *(int *)acc += *(int *)elem;
-}
-
-Iterator it = dfarray_iterator_create(array);
-int initial = 0;
-
-int *reduced = (int *)df_reduce(&it, &initial, sum_int);
-printf("Reduced value: %d", *reduced);
-
-free(reduced);
-iterator_destroy(&it);
-dfarray_destroy(array);
 ```
 
 ---
 
-### `void df_free_all(Iterator *it)`
+### `DfResult df_free_all(Iterator *it)`
 
 `df_free_all` frees the memory of all elements inside the data structure but leaves the structure itself intact so it can be reused.
 
 #### Usage
 ```c
-DfArray *array = dfarray_create(sizeof(int), 3);
-int nums[] = {10, 23, 30};
-for (int i = 0; i < 3; i++) {
-  dfarray_push(array, &nums[i]);
+DfResult res = dfarray_create(sizeof(int), 3);
+if (res.error) {
+  // Handle error
+} else {
+  DfArray *array = (DfArray *)res.value;
+  int nums[] = {10, 23, 30};
+  for (int i = 0; i < 3; i++) {
+    dfarray_push(array, &nums[i]);
+  }
+
+  DfResult it_res = dfarray_iterator_create(array);
+  if (it_res.error) {
+    // Handle error
+  } else {
+    Iterator it = *(Iterator *)it_res.value;
+    DfResult free_all_res = df_free_all(&it);
+
+    if (free_all_res.error) {
+      // Handle error
+    }
+
+    // Safe to reuse the structure
+    int new_num = 5;
+    dfarray_push(array, &new_num);
+
+    iterator_destroy(&it);
+    dfarray_destroy(array);
+  }
 }
-
-Iterator it = dfarray_iterator_create(array);
-df_free_all(&it);
-
-// Safe to reuse the structure
-int new_num = 5;
-dfarray_push(array, &new_num);
-
-iterator_destroy(&it);
-dfarray_destroy(array);
 ```
 
 </details>
