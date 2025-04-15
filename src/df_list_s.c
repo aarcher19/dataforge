@@ -1,5 +1,5 @@
 #include "../includes/df_list_s.h"
-#include <criterion/alloc.h>
+#include "../includes/df_common.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -17,39 +17,35 @@ typedef struct DfList_S_Node
   struct DfList_S_Node *next;
 } DfList_S_Node;
 
-/*
-typedef struct DfList_D {
-  DfList_D_Node *head;
-  DfList_D_Node *tail;
-  size_t length;
-} DfList_D;
-
-typedef struct DfList_D_Node {
-  void *element;
-  struct DfList_D_Node *next;
-  struct DfList_D_Node *prev;
-} DfList_D_Node;
-*/
-
-DfList_S *dflist_s_create()
+DfResult dflist_s_create()
 {
+  DfResult res;
+  res.value = NULL;
+
   DfList_S *list = malloc(sizeof(DfList_S));
   if (!list)
   {
-    return NULL;
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
   }
 
   list->head = list->tail = NULL;
   list->length = 0;
 
-  return list;
+  res.error = DF_OK;
+  res.value = list;
+  return res;
 }
 
-void dflist_s_destroy(DfList_S *list, void (*cleanup)(void *element))
+DfResult dflist_s_destroy(DfList_S *list, void (*cleanup)(void *element))
 {
+  DfResult res;
+  res.value = NULL;
+
   if (!list)
   {
-    return;
+    res.error = DF_ERR_NULL_PTR;
+    return res;
   }
 
   DfList_S_Node *current = list->head;
@@ -63,34 +59,47 @@ void dflist_s_destroy(DfList_S *list, void (*cleanup)(void *element))
   }
 
   free(list);
+
+  res.error = DF_OK;
+  return res;
 }
 
-DfList_S_Node *dflist_s_create_node(void *element)
+DfResult dflist_s_create_node(void *element)
 {
+  DfResult res;
+  res.value = NULL;
+
   DfList_S_Node *new_node = malloc(sizeof(DfList_S_Node));
   if (!new_node)
   {
-    perror("Failed to allocate memory for new node");
-    return NULL;
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
   }
 
   new_node->element = element;
   new_node->next = NULL;
 
-  return new_node;
+  res.error = DF_OK;
+  res.value = new_node;
+  return res;
 }
 
-void dflist_s_push_back(DfList_S *list, void *element)
+DfResult dflist_s_push_back(DfList_S *list, void *element)
 {
+  DfResult res;
+  res.value = NULL;
+
   if (!list)
   {
-    return;
+    res.error = DF_ERR_NULL_PTR;
+    return res;
   }
 
-  DfList_S_Node *new_node = dflist_s_create_node(element);
-  if (!new_node)
+  DfResult new_node_res = dflist_s_create_node(element);
+  DfList_S_Node *new_node = (DfList_S_Node *)new_node_res.value;
+  if (new_node_res.error != DF_OK)
   {
-    return;
+    return new_node_res;
   }
 
   if (!list->head)
@@ -105,19 +114,27 @@ void dflist_s_push_back(DfList_S *list, void *element)
   }
 
   list->length++;
+
+  res.error = DF_OK;
+  return res;
 }
 
-void dflist_s_push_front(DfList_S *list, void *element)
+DfResult dflist_s_push_front(DfList_S *list, void *element)
 {
+  DfResult res;
+  res.value = NULL;
+
   if (!list)
   {
-    return;
+    res.error = DF_ERR_NULL_PTR;
+    return res;
   }
 
-  DfList_S_Node *new_node = dflist_s_create_node(element);
-  if (!new_node)
+  DfResult new_node_res = dflist_s_create_node(element);
+  DfList_S_Node *new_node = (DfList_S_Node *)new_node_res.value;
+  if (new_node_res.error != DF_OK)
   {
-    return;
+    return new_node_res;
   }
 
   if (!list->head)
@@ -132,19 +149,26 @@ void dflist_s_push_front(DfList_S *list, void *element)
   }
 
   list->length++;
+
+  res.error = DF_OK;
+  return res;
 }
 
-void *dflist_s_pop_front(DfList_S *list)
+DfResult dflist_s_pop_front(DfList_S *list)
 {
+  DfResult res;
+  res.value = NULL;
+
   if (!list)
   {
-    return NULL;
+    res.error = DF_ERR_NULL_PTR;
+    return res;
   }
 
   if (!list->head)
   {
-    perror("Can not pop from empty list");
-    return NULL;
+    res.error = DF_ERR_EMPTY;
+    return res;
   }
 
   DfList_S_Node *old_head = list->head;
@@ -153,21 +177,27 @@ void *dflist_s_pop_front(DfList_S *list)
   free(old_head);
   list->length--;
 
+  res.error = DF_OK;
+  res.value = dest;
   // Ensure to document user takes control of element memory (need to free it when done)
-  return dest;
+  return res;
 }
 
-void *dflist_s_pop_back(DfList_S *list)
+DfResult dflist_s_pop_back(DfList_S *list)
 {
+  DfResult res;
+  res.value = NULL;
+
   if (!list)
   {
-    return NULL;
+    res.error = DF_ERR_NULL_PTR;
+    return res;
   }
 
   if (!list->tail)
   {
-    perror("Can not pop from empty list");
-    return NULL;
+    res.error = DF_ERR_EMPTY;
+    return res;
   }
 
   void *dest;
@@ -196,8 +226,60 @@ void *dflist_s_pop_back(DfList_S *list)
 
   list->length--;
 
+  res.error = DF_OK;
+  res.value = dest;
   // Ensure to document user takes control of element memory (need to free it when done)
-  return dest;
+  return res;
 }
 
-void dflist_s_insert_at() {}
+DfResult dflist_s_insert_at(DfList_S *list, void *element, size_t index)
+{
+  DfResult res;
+  res.value = NULL;
+
+  if (!list)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
+  if (index > list->length)
+  {
+    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
+    return res;
+  }
+
+  if (index == 0)
+  {
+    DfResult push_front_res = dflist_s_push_front(list, element);
+    return push_front_res;
+  }
+
+  if (index == list->length)
+  {
+    DfResult push_back_res = dflist_s_push_back(list, element);
+    return push_back_res;
+  }
+
+  DfResult new_node_res = dflist_s_create_node(element);
+  DfList_S_Node *new_node = (DfList_S_Node *)new_node_res.value;
+  if (new_node_res.error != DF_OK)
+  {
+    return new_node_res;
+  }
+
+  size_t i = 0;
+  DfList_S_Node *cur = list->head;
+
+  for (size_t i = 0; i < index - 1; i++)
+  {
+    cur = cur->next;
+  }
+
+  new_node->next = cur->next;
+  cur->next = new_node;
+  list->length++;
+
+  res.error = DF_OK;
+  return res;
+}

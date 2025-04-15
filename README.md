@@ -7,72 +7,99 @@ Data Forge is a lightweight and extensible C library that provides high-level co
   <summary><strong>DfArray - Dynamic Array</strong></summary>
 
   ### DfArray
-  DfArray is a lightweight, dynamic array that provides high-level and memory safe functionality to standard static C array's.
-  
+  DfArray is a lightweight, dynamic array that provides high-level and memory-safe functionality to standard static C arrays. All operations return a `DfResult` type, encapsulating both the result and potential error.
+
   ### Features
   - **Dynamic resizing**: Automatically expands when elements are added.
-  - **Bounds checking**: Prevents out-of-bounds access with safe error handling.
+  - **Bounds checking**: Prevents out-of-bounds access with detailed error reporting.
   - **Generic storage**: Supports any data type via `void *` and configurable element sizes.
   - **Push/pop & unshift/shift operations**: Similar to JavaScript arrays.
   - **Functional mapping**: Apply functions to all elements.
   - **Iteration**: Iterate sequentially through all elements.
-  
+  - **Unified error handling**: Every function returns a `DfResult`, enabling precise control and logging.
+
+  > 💡 Use `df_error_to_string(result.error)` to convert error codes into human-readable messages.
+
   <details>
     <summary><strong>Usage</strong></summary>
-  
+
   #### Creating and Destroying an Array
   ```c
   DfArray *array = dfarray_create(sizeof(int), 10);
   dfarray_destroy(array);
   ```
-  
+
   #### Getting and Setting Elements
   ```c
   int num = 10;
-  dfarray_set(array, 1, &num);
-  int *retrieved = (int *)dfarray_get(array, 1);
-  printf("Retrieved value: %d\n", *retrieved);
-  free(retrieved);
+  DfResult set_result = dfarray_set(array, 1, &num);
+  if (set_result.error != DF_OK) {
+      printf("Set error: %s\n", df_error_to_string(set_result.error));
+  }
+
+  DfResult get_result = dfarray_get(array, 1);
+  if (get_result.error == DF_OK) {
+      int *retrieved = (int *)get_result.value;
+      printf("Retrieved value: %d\n", *retrieved);
+      free(retrieved);
+  } else {
+      printf("Get error: %s\n", df_error_to_string(get_result.error));
+  }
   ```
-  
+
   #### Adding and Removing Elements
   ```c
   int value = 42;
   dfarray_push(array, &value);
-  int *popped = (int *)dfarray_pop(array);
-  printf("Popped value: %d\n", *popped);
-  free(popped);
-  
+
+  DfResult pop_result = dfarray_pop(array);
+  if (pop_result.error == DF_OK) {
+      int *popped = (int *)pop_result.value;
+      printf("Popped value: %d\n", *popped);
+      free(popped);
+  }
+
   int value2 = 25;
   dfarray_unshift(array, &value2);
-  int *shifted = (int *)dfarray_shift(array);
-  printf("Shifted value: %d\n", *shifted);
-  free(shifted);
-  
+
+  DfResult shift_result = dfarray_shift(array);
+  if (shift_result.error == DF_OK) {
+      int *shifted = (int *)shift_result.value;
+      printf("Shifted value: %d\n", *shifted);
+      free(shifted);
+  }
+
   int value3 = 30;
   dfarray_insert_at(array, 1, &value3);
-  int *inserted = (int *)dfarray_get(array, 1);
-  printf("Inserted value: %d\n", *inserted);
-  free(inserted);
+
+  DfResult inserted_result = dfarray_get(array, 1);
+  if (inserted_result.error == DF_OK) {
+      int *inserted = (int *)inserted_result.value;
+      printf("Inserted value: %d\n", *inserted);
+      free(inserted);
+  }
+
   dfarray_remove_at(array, 1);
   ```
+
   #### Iteration
   ```c
   DfArray *array = dfarray_create(sizeof(int), 3);
   int nums[] = {10, 20, 30};
-  for(int i = 0; i < 3; i++){
-    dfarray_push(array, &nums[i]);
+  for (int i = 0; i < 3; i++) {
+      dfarray_push(array, &nums[i]);
   }
 
   Iterator it = dfarray_iterator_create(array);
-  while(it.has_next(&it)){
-    printf("Value: %d", *(int *)it.next(&it));
-  };
+  while (it.has_next(&it)) {
+      void *val = it.next(&it);
+      printf("Value: %d\n", *(int *)val);
+  }
 
   iterator_destroy(&it);
   dfarray_destroy(array);
   ```
-  
+
   #### Applying a Function to All Elements
   ```c
   void printInt(void *item) {
@@ -80,80 +107,129 @@ Data Forge is a lightweight and extensible C library that provides high-level co
   }
   dfarray_map(array, printInt);
   ```
+
   </details>
 
   <details>
     <summary><strong>API Reference</strong></summary>
-    
+
   #### `DfArray* dfarray_create(size_t elem_size, size_t initial_capacity)`
   Allocates a new dynamic array.
-  
+
   #### `void dfarray_destroy(DfArray* array)`
   Frees memory associated with the array.
-  
-  #### `void dfarray_push(DfArray* array, void *value)`
-  Adds an element to the end, resizing if needed.
-  
-  #### `void *dfarray_pop(DfArray* array)`
-  Removes and retrieves the last element.
-  
-  #### `void dfarray_unshift(DfArray* array, void *value)`
-  Adds an element to the front, resizing if needed.
-  
-  #### `void *dfarray_shift(DfArray* array)`
+
+  #### `DfResult dfarray_push(DfArray* array, void *value)`
+  Adds an element to the end. Returns `DF_OK` or error code.
+
+  #### `DfResult dfarray_pop(DfArray* array)`
+  Removes and retrieves the last element. `value` contains the element if successful.
+
+  #### `DfResult dfarray_unshift(DfArray* array, void *value)`
+  Adds an element to the front.
+
+  #### `DfResult dfarray_shift(DfArray* array)`
   Removes and retrieves the first element.
-  
-  #### `void dfarray_set(DfArray* array, size_t index, void *value)`
-  Updates a given element at a specified index.
-  
-  #### `void *dfarray_get(DfArray* array, size_t index)`
+
+  #### `DfResult dfarray_set(DfArray* array, size_t index, void *value)`
+  Updates an element at a given index.
+
+  #### `DfResult dfarray_get(DfArray* array, size_t index)`
   Retrieves an element with bounds checking.
-  
-  #### `void dfarray_insert_at(DfArray* array, size_t index, void *value)`
-  Inserts an element at a specified index and shifts following elements to the right.
-  
-  #### `void dfarray_remove_at(DfArray* array, size_t index)`
-  Removes an element at a specified index and shifts following elements to the left.
-  
+
+  #### `DfResult dfarray_insert_at(DfArray* array, size_t index, void *value)`
+  Inserts an element at a specified index and shifts elements to the right.
+
+  #### `DfResult dfarray_remove_at(DfArray* array, size_t index)`
+  Removes an element at a specified index and shifts elements to the left.
+
   #### `void dfarray_map(DfArray *array, void (*func)(void *))`
   Applies a function to each element.
 
   #### `Iterator dfarray_iterator_create(DfArray *array)`
   Creates an iterator for a dynamic array.
-  
+
   #### `int dfarray_iterator_has_next(Iterator *it)`
-  Checks if there is a value to iterate over.
-  
+  Checks if there is a next value to iterate over.
+
   #### `void *dfarray_iterator_next(Iterator *it)`
-  Iterates over the next value in the array.
-  
-  </details>  
+  Retrieves the next value in the array.
+
+  </details>
 </details>
+
 <details>
   <summary><strong>DfList_S - Singly Linked List</strong></summary>
 
-  ### DfList_S
-  DfList_S is a lightweight, dynamic singly linked list that provides high-level and memory safe functionality with generic type storage.
+### DfList_S
 
-  ### Features
-  - **Dynamic & Generic** – Stores any data type using void *
-  - **Insertion** – Add elements at the front, back, or a specific index.
-  - **Deletion** – Remove elements from the front, back, or a specific index.
-  - **Access & Lookup** – Retrieve elements by index, find values with a comparator.
-  - **Iteration** - Iterate sequentially through all elements.
-  - **Safe Memory Management** – Custom cleanup function for freeing stored data.
+`DfList_S` is a lightweight, dynamic singly linked list that provides high-level and memory-safe functionality with generic type storage.
+
+---
+
+### Features
+
+- **Dynamic & Generic** – Stores any data type using `void *`.
+- **Insertion** – Add elements at the front, back, or a specific index.
+- **Deletion** – Remove elements from the front or back.
+- **Safe Memory Management** – Custom cleanup function for freeing stored data.
+- **Robust Error Handling** – Returns `DfResult` with error codes for safer programming.
+
+---
 
 <details>
-    <summary><strong>Usage</strong></summary>
+<summary><strong>Usage</strong></summary>
+
+```c
+DfResult res = dflist_s_create();
+DfList_S *list = (DfList_S *)res.value;
+
+dflist_s_push_back(list, my_data);
+dflist_s_push_front(list, other_data);
+
+DfResult popped = dflist_s_pop_back(list);
+// Remember to free the popped element if necessary
+
+dflist_s_destroy(list, free); // free each element using user-defined cleanup
+```
+
 </details>
+
+---
 
 <details>
-    <summary><strong>API Reference</strong></summary>
+<summary><strong>API Reference</strong></summary>
 
-  #### `void DfList_S_Destroy(DfList_S *list, void (*cleanup)(void *element))`
-  Free's a DfList_S struct and nodes. Allows user to pass cleanup function that determines how the elements stored in the linked list are free'd. 
+#### `DfResult dflist_s_create()`
+Creates a new singly linked list.  
+Returns a `DfResult` with `value` pointing to the new `DfList_S`.
+
+#### `DfResult dflist_s_destroy(DfList_S *list, void (*cleanup)(void *element))`
+Destroys the list and all of its nodes.  
+Calls `cleanup` on each element if provided.
+
+#### `DfResult dflist_s_push_back(DfList_S *list, void *element)`
+Appends an element to the end of the list.
+
+#### `DfResult dflist_s_push_front(DfList_S *list, void *element)`
+Prepends an element to the front of the list.
+
+#### `DfResult dflist_s_pop_back(DfList_S *list)`
+Removes and returns the last element in the list.  
+⚠️ User is responsible for freeing the returned element if necessary.
+
+#### `DfResult dflist_s_pop_front(DfList_S *list)`
+Removes and returns the first element in the list.  
+⚠️ User is responsible for freeing the returned element if necessary.
+
+#### `DfResult dflist_s_insert_at(DfList_S *list, void *element, size_t index)`
+Inserts an element at the specified index.  
+Returns an error if index is out of bounds.
+
 </details>
+
 </details>
+
 
 ## Utils
 Data Forge uses a monolithic utils header for ease of use. To use any utility function include df_utils.h in your file as shown below.
@@ -161,62 +237,71 @@ Data Forge uses a monolithic utils header for ease of use. To use any utility fu
 #include <dataforge/df_utils.h>
 ```
 
+
 <details>
   <summary><strong>Generic - Can be used with any data structure</strong></summary>
 
-  ### `void *df_map(Iterator *it, void *(*func)(void *element))`
-  df_map takes an iterator and a function pointer as arguments. It iterates over any data structure and apply's a function to each element, then returns a new data structure      containing the modified elements.
+### `void *df_map(Iterator *it, void *(*func)(void *element))`
 
-  ### Usage
-  ```c
-  DfArray *array = dfarray_create(sizeof(int), 3);
-  int nums[] = {10, 20, 30};
-  for(int i = 0; i < 3; i++){
-    dfarray_push(array, &nums[i]);
-  }
+`df_map` takes an iterator and a function pointer as arguments. It iterates over any data structure, applies the provided function to each element, and returns a new data structure containing the modified elements.
 
-  void *double_element(void *element) {
-    int *value = (int *)element;
-    int *modified_value = malloc(sizeof(int));
-    *modified_value = (*value) * 2;
-    return modified_value;
-  }
+#### Usage
+```c
+DfArray *array = dfarray_create(sizeof(int), 3);
+int nums[] = {10, 20, 30};
+for (int i = 0; i < 3; i++) {
+  dfarray_push(array, &nums[i]);
+}
 
-  Iterator it = dfarray_iterator_create(array);
+void *double_element(void *element) {
+  int *value = (int *)element;
+  int *modified = malloc(sizeof(int));
+  *modified = (*value) * 2;
+  return modified;
+}
 
-  // cast returned data structure to proper type
-  DfArray *new_array = (DfArray *)df_map(&it, double_element);
-  ```
-  ### `void *df_filter(Iterator *it, bool (*func)(void *element))`
-  df_filter takes an iterator and function pointer that returns a bool as parameters. It iterates over any data structure and applies the comparison function to each element. It then returns a new data structure containing the filtered elements that met the condition in the comparison function.
+Iterator it = dfarray_iterator_create(array);
 
-  ### Usage
-  ```c
-  DfArray *array = dfarray_create(sizeof(int), 3);
-  int nums[] = {10, 23, 30};
-  for(int i = 0; i < 3; i++){
-    dfarray_push(array, &nums[i]);
-  }
+// Cast returned data structure to proper type
+DfArray *new_array = (DfArray *)df_map(&it, double_element);
+```
 
-  bool isEven(void *element) {
-    return *(int *)element % 2 == 0;
-  }
+---
 
-  Iterator it = dfarray_iterator_create(array);
+### `void *df_filter(Iterator *it, bool (*func)(void *element))`
 
-  // Cast returned data structure to propper type
-  DfArray *filtered = (DfArray *)df_filter(&it, isEven);
-  ```
+`df_filter` takes an iterator and a boolean function pointer. It returns a new data structure containing only the elements that satisfy the condition in the provided function.
 
-### `void *df_find(Iterator *it, bool (*func)(void *element))`
-df_find takes an iterator and a function pointer that returns a bool as parameters. It iterates over any data structure and applies the comparison function to each elemenet. It then returns the first element that meets the condition in the comparison function.
-
-### Usage
+#### Usage
 ```c
 DfArray *array = dfarray_create(sizeof(int), 3);
 int nums[] = {10, 23, 30};
-for(int i = 0; i < 3; i++){
-    dfarray_push(array, &nums[i]);
+for (int i = 0; i < 3; i++) {
+  dfarray_push(array, &nums[i]);
+}
+
+bool is_even(void *element) {
+  return *(int *)element % 2 == 0;
+}
+
+Iterator it = dfarray_iterator_create(array);
+
+// Cast returned data structure to proper type
+DfArray *filtered = (DfArray *)df_filter(&it, is_even);
+```
+
+---
+
+### `void *df_find(Iterator *it, bool (*func)(void *element))`
+
+`df_find` searches through a data structure and returns the first element that satisfies the condition specified in the provided function.
+
+#### Usage
+```c
+DfArray *array = dfarray_create(sizeof(int), 3);
+int nums[] = {10, 23, 30};
+for (int i = 0; i < 3; i++) {
+  dfarray_push(array, &nums[i]);
 }
 
 bool greater_than_10(void *element) {
@@ -226,7 +311,6 @@ bool greater_than_10(void *element) {
 Iterator it = dfarray_iterator_create(array);
 void *found = df_find(&it, greater_than_10);
 
-// Best practice to check for null before casting to propper type
 if (found != NULL) {
   printf("Found element: %d", *(int *)found);
 } else {
@@ -234,89 +318,105 @@ if (found != NULL) {
 }
 ```
 
-### `void df_for_each(Iterator *it, void (*func)(void *element))`
-df_for_each takes an iterator and a function pointer as parameters. It iterates through any data structure and applies the provided function to each element. It does not return anything nor does it modify the original data structure.
+---
 
-### Usage
+### `void df_for_each(Iterator *it, void (*func)(void *element))`
+
+`df_for_each` applies a function to every element in the data structure without modifying the structure or returning a value.
+
+#### Usage
 ```c
 DfArray *array = dfarray_create(sizeof(int), 3);
 int nums[] = {10, 23, 30};
-for(int i = 0; i < 3; i++){
-    dfarray_push(array, &nums[i]);
+for (int i = 0; i < 3; i++) {
+  dfarray_push(array, &nums[i]);
 }
 
-void print_num_plus_2(void *element) {
+void print_plus_two(void *element) {
   printf("%d\n", *(int *)element + 2);
 }
 
 Iterator it = dfarray_iterator_create(array);
-df_for_each(&it, print_num_plus_2);
+df_for_each(&it, print_plus_two);
 ```
 
-### `size_t df_count(Iterator *it, bool (*func)(void *element))`
-df_count takes an iterator and a function pointer as parameters. It iterates through any data structure and applies the passed in comparison function to each element to see if the element satisfies a condition, if the function returns true a count is incremented. The final count is then returned.
+---
 
-### Usage
+### `size_t df_count(Iterator *it, bool (*func)(void *element))`
+
+`df_count` returns the number of elements in the data structure that satisfy the given condition function.
+
+#### Usage
 ```c
 DfArray *array = dfarray_create(sizeof(int), 3);
 int nums[] = {10, 23, 30};
-for(int i = 0; i < 3; i++){
-    dfarray_push(array, &nums[i]);
+for (int i = 0; i < 3; i++) {
+  dfarray_push(array, &nums[i]);
 }
 
-bool isEven(void *element) {
-    return *(int *)element % 2 == 0;
+bool is_even(void *element) {
+  return *(int *)element % 2 == 0;
 }
 
 Iterator it = dfarray_iterator_create(array);
-size_t count = df_count(&it, isEven);
+size_t count = df_count(&it, is_even);
+printf("Count: %zu", count);
 ```
+
+---
 
 ### `void *df_reduce(Iterator *it, void *initial, void (*func)(void *accumulator, void *element))`
-df_reduce takes a pointer to an interator, pointer to an initial value and a function pointer as parameters. It iterates through any data structure and applies the function to every element in the data structure and returns the reduced value.
 
-### Usage
+`df_reduce` takes an iterator, an initial value, and a reducer function. It combines all elements into a single result based on the reducer logic.
+
+#### Usage
 ```c
-  DfArray *array = dfarray_create(sizeof(int), 3);
-  int nums[] = {10, 23, 30};
-  for(int i = 0; i < 3; i++) {
-    dfarray_push(array, &nums[i]);
-  }
-  Iterator it = dfarray_iterator_create(array);
+DfArray *array = dfarray_create(sizeof(int), 3);
+int nums[] = {10, 23, 30};
+for (int i = 0; i < 3; i++) {
+  dfarray_push(array, &nums[i]);
+}
 
-  void sum_int(void *acc, void *elem) {
-    *(int *)acc += *(int *)elem;
-  }
+void sum_int(void *acc, void *elem) {
+  *(int *)acc += *(int *)elem;
+}
 
-  int initial = 0;
-  int *reduced = (int *)df_reduce(&it, &initial, sum_int);
-  printf("Reduced: %d", *reduced);
+Iterator it = dfarray_iterator_create(array);
+int initial = 0;
 
-  free(reduced);
-  iterator_destroy(&it);
-  dfarray_destroy(array);
+int *reduced = (int *)df_reduce(&it, &initial, sum_int);
+printf("Reduced value: %d", *reduced);
+
+free(reduced);
+iterator_destroy(&it);
+dfarray_destroy(array);
 ```
+
+---
 
 ### `void df_free_all(Iterator *it)`
-df_free_all takes an iterator pointer as a parameter. It frees all elements in the data structure from memory without freeing the data structure struct itself allowing you to continue using the now empty data structure.
 
-### Usage
+`df_free_all` frees the memory of all elements inside the data structure but leaves the structure itself intact so it can be reused.
+
+#### Usage
 ```c
-  DfArray *array = dfarray_create(sizeof(int), 3);
-  int nums[] = {10, 23, 30};
-  for(int i = 0; i < 3; i++) {
-    dfarray_push(array, &nums[i]);
-  }
+DfArray *array = dfarray_create(sizeof(int), 3);
+int nums[] = {10, 23, 30};
+for (int i = 0; i < 3; i++) {
+  dfarray_push(array, &nums[i]);
+}
 
-  Iterator it = dfarray_iterator_create(array);
-  df_free_all(&it);
+Iterator it = dfarray_iterator_create(array);
+df_free_all(&it);
 
-  int newNum = 5;
-  dfarray_push(array, &newNum);
-  
-  iterator_destroy(&it);
-  dfarray_destroy(array);
+// Safe to reuse the structure
+int new_num = 5;
+dfarray_push(array, &new_num);
+
+iterator_destroy(&it);
+dfarray_destroy(array);
 ```
+
 </details>
 
 ## Contributing

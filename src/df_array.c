@@ -3,6 +3,7 @@
 #include <string.h>
 #include "../includes/df_array.h"
 #include "../includes/df_iterator.h"
+#include "../includes/df_common.h"
 
 // Core functionality
 
@@ -14,43 +15,66 @@ typedef struct DfArray
   size_t capacity;
 } DfArray;
 
-DfArray *dfarray_create(size_t elem_size, size_t initial_capacity)
+DfResult dfarray_create(size_t elem_size, size_t initial_capacity)
 {
+  DfResult res;
+  res.value = NULL;
+
   DfArray *array = malloc(sizeof(DfArray));
   if (!array)
   {
-    perror("Struct memory allocation failed.");
-    exit(EXIT_FAILURE);
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
   }
 
   array->items = malloc(initial_capacity * elem_size);
   if (!array->items)
   {
     free(array);
-    perror("Items memory allocation failed.");
-    exit(EXIT_FAILURE);
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
   }
 
   array->length = 0;
   array->elem_size = elem_size;
   array->capacity = initial_capacity;
 
-  return array;
+  res.value = array;
+  return res;
 }
 
-void dfarray_destroy(DfArray *array)
+DfResult dfarray_destroy(DfArray *array)
 {
-  if (array)
+  DfResult res;
+  res.value = NULL;
+
+  if (!array)
   {
-    free(array->items);
-    free(array);
+    res.error = DF_ERR_NULL_PTR;
+    return res;
   }
+
+  free(array->items);
+  free(array);
+
+  res.error = DF_OK;
+  return res;
 }
 
-void dfarray_resize(DfArray *array)
+DfResult dfarray_resize(DfArray *array)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!array)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   size_t new_capacity;
   void *resized_items;
+
   if (array->capacity == 0)
   {
     new_capacity = 5;
@@ -64,22 +88,36 @@ void dfarray_resize(DfArray *array)
 
   if (!resized_items)
   {
-    perror("Reallocation of IntArray->capacity failed");
-    return;
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
   }
 
   array->items = resized_items;
   array->capacity = new_capacity;
+
+  res.error = DF_OK;
+  return res;
 }
 
-void dfarray_shrink(DfArray *array)
+DfResult dfarray_shrink(DfArray *array)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!array)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   if (array->length == 0)
   {
     free(array->items);
     array->items = NULL;
     array->capacity = 0;
-    return;
+
+    res.error = DF_OK;
+    return res;
   }
 
   size_t new_capacity = array->length;
@@ -87,105 +125,238 @@ void dfarray_shrink(DfArray *array)
 
   if (!shrunk_items)
   {
-    perror("Realloc failed in dfArray_Shrink.");
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
   }
 
   array->items = shrunk_items;
   array->capacity = new_capacity;
+
+  res.error = DF_OK;
+  return res;
 }
 
-void *dfarray_get(DfArray *array, size_t index)
+DfResult dfarray_get(DfArray *array, size_t index)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!array)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   if (index >= array->length)
   {
-    fprintf(stderr, "Error: Index %zu out of bounds (length: %zu)\n", index, array->length);
-    exit(1);
+    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
+    return res;
   }
+
   void *dest = malloc(array->elem_size);
+  if (!dest)
+  {
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
+  }
+
   memcpy(dest, (char *)array->items + index * array->elem_size, array->elem_size);
-  return dest;
+
+  res.value = dest;
+  res.error = DF_OK;
+  return res;
 }
 
-void dfarray_set(DfArray *array, size_t index, void *value)
+DfResult dfarray_set(DfArray *array, size_t index, void *value)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!array)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   if (index >= array->length)
   {
-    fprintf(stderr, "Error: Index %zu out of bounds (length: %zu)\n", index, array->length);
-    exit(1);
+    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
+    return res;
   }
+
   memcpy((char *)array->items + index * array->elem_size, value, array->elem_size);
+
+  res.error = DF_OK;
+  return res;
 }
 
-void dfarray_push(DfArray *array, void *value)
+DfResult dfarray_push(DfArray *array, void *value)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!array)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   if (array->length >= array->capacity)
   {
-    dfarray_resize(array);
+    DfResult resize_res = dfarray_resize(array);
+    if (resize_res.error != DF_OK)
+    {
+      return resize_res;
+    }
   }
 
   memcpy((char *)array->items + array->length * array->elem_size, value, array->elem_size);
   array->length++;
+
+  res.error = DF_OK;
+  return res;
 }
 
-void *dfarray_pop(DfArray *array)
+DfResult dfarray_pop(DfArray *array)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!array)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   if (array->length < 1)
   {
-    fprintf(stderr, "Error: Array is empty, can not pop\n");
-    exit(1);
+    res.error = DF_ERR_EMPTY;
+    return res;
   }
+
   void *dest = malloc(array->elem_size);
+  if (!dest)
+  {
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
+  }
+
   memcpy(dest, (char *)array->items + (array->length - 1) * array->elem_size, array->elem_size);
   array->length--;
 
   if (array->length <= array->capacity / 2 || array->length == 0)
   {
-    dfarray_shrink(array);
+    DfResult shrink_res = dfarray_shrink(array);
+    if (shrink_res.error != DF_OK)
+    {
+      free(dest);
+      return shrink_res;
+    }
   }
 
-  return dest;
+  res.error = DF_OK;
+  res.value = dest;
+  return res;
 }
 
-void *dfarray_shift(DfArray *array)
+DfResult dfarray_shift(DfArray *array)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!array)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   if (array->length == 0)
   {
-    fprintf(stderr, "Error: Cannot shift from an empty array\n");
-    exit(1);
+    res.error = DF_ERR_EMPTY;
+    return res;
   }
+
   void *dest = malloc(array->elem_size);
+  if (!dest)
+  {
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
+  }
+
   memcpy(dest, array->items, array->elem_size);
   memmove(array->items, (char *)array->items + array->elem_size, (array->length - 1) * array->elem_size);
   array->length--;
 
   if (array->length <= array->capacity / 2 || array->length == 0)
   {
-    dfarray_shrink(array);
+    DfResult shrink_res = dfarray_shrink(array);
+    if (shrink_res.error != DF_OK)
+    {
+      free(dest);
+      return shrink_res;
+    }
   }
 
-  return dest;
+  res.error = DF_OK;
+  res.value = dest;
+  return res;
 }
 
-void dfarray_unshift(DfArray *array, void *value)
+DfResult dfarray_unshift(DfArray *array, void *value)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!array || !value)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   if (array->length >= array->capacity)
   {
-    dfarray_resize(array);
+    DfResult resize_res = dfarray_resize(array);
+    if (resize_res.error != DF_OK)
+    {
+      return resize_res;
+    }
   }
 
   memmove((char *)array->items + array->elem_size, array->items, array->length * array->elem_size);
   memcpy(array->items, value, array->elem_size);
 
   array->length++;
+
+  res.error = DF_OK;
+  return res;
 }
 
-void dfarray_insert_at(DfArray *array, size_t index, void *value)
+DfResult dfarray_insert_at(DfArray *array, size_t index, void *value)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!array || !value)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
+  if (index > array->length)
+  {
+    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
+    return res;
+  }
+
   if (index < array->length)
   {
     if (array->length >= array->capacity)
     {
-      dfarray_resize(array);
+      DfResult resize_res = dfarray_resize(array);
+      if (resize_res.error != DF_OK)
+      {
+        return resize_res;
+      }
     }
 
     memmove(
@@ -194,50 +365,57 @@ void dfarray_insert_at(DfArray *array, size_t index, void *value)
         (array->length - index) * array->elem_size);
 
     memcpy((char *)array->items + index * array->elem_size, value, array->elem_size);
-
     array->length++;
   }
-  else if (index == array->length)
+  else // index == array->length
   {
-    dfarray_push(array, value);
+    DfResult push_res = dfarray_push(array, value);
+    if (push_res.error != DF_OK)
+    {
+      return push_res;
+    }
   }
-  else
-  {
-    fprintf(stderr, "Error: Index %zu out of bounds (length: %zu)\n", index, array->length);
-    exit(1);
-  }
+
+  res.error = DF_OK;
+  return res;
 }
 
-void dfarray_remove_at(DfArray *array, size_t index)
+DfResult dfarray_remove_at(DfArray *array, size_t index)
 {
-  if (index < array->length)
-  {
-    memmove(
-        (char *)array->items + index * array->elem_size,
-        (char *)array->items + (index + 1) * array->elem_size,
-        (array->length - index - 1) * array->elem_size);
+  DfResult res;
+  res.value = NULL;
 
-    array->length--;
-  }
-  else
+  if (!array)
   {
-    fprintf(stderr, "Error: Index %zu out of bounds (length: %zu)\n", index, array->length);
-    exit(1);
+    res.error = DF_ERR_NULL_PTR;
+    return res;
   }
+
+  if (index >= array->length)
+  {
+    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
+    return res;
+  }
+
+  memmove(
+      (char *)array->items + index * array->elem_size,
+      (char *)array->items + (index + 1) * array->elem_size,
+      (array->length - index - 1) * array->elem_size);
+
+  array->length--;
 
   if (array->length < array->capacity / 2)
   {
-    dfarray_shrink(array);
+    DfResult shrink_res = dfarray_shrink(array);
+    if (shrink_res.error != DF_OK)
+    {
+      return shrink_res;
+    }
   }
-}
 
-void dfarray_map(DfArray *array, void (*func)(void *))
-{
-  for (size_t i = 0; i < array->length; i++)
-  {
-    func((char *)array->items + (i * array->elem_size));
-  }
-};
+  res.error = DF_OK;
+  return res;
+}
 
 // Iterator
 
@@ -253,28 +431,82 @@ int dfarray_iterator_has_next(Iterator *it)
   return arr_it->index < arr_it->array->length;
 }
 
-void *dfarray_iterator_next(Iterator *it)
+DfResult dfarray_iterator_next(Iterator *it)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!it || !it->current)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   DfArray_Iterator *arr_it = (DfArray_Iterator *)it->current;
-  if (!dfarray_iterator_has_next(it))
-    return NULL;
-  return (char *)arr_it->array->items + (arr_it->index++ * arr_it->array->elem_size);
+
+  if (arr_it->index >= arr_it->array->length)
+  {
+    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
+    return res;
+  }
+
+  void *elem_ptr = (char *)arr_it->array->items + (arr_it->index++ * arr_it->array->elem_size);
+  void *copied_elem = malloc(arr_it->array->elem_size);
+  if (!copied_elem)
+  {
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
+  }
+
+  memcpy(copied_elem, elem_ptr, arr_it->array->elem_size);
+
+  res.error = DF_OK;
+  res.value = copied_elem;
+  return res;
 }
 
-void *dfarray_create_new(Iterator *it)
+DfResult dfarray_create_new(Iterator *it)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!it)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   DfArray_Iterator *arr_it = (DfArray_Iterator *)it->current;
 
-  DfArray *new_array = dfarray_create(arr_it->array->elem_size, arr_it->array->capacity);
+  DfResult new_array_res = dfarray_create(arr_it->array->elem_size, arr_it->array->capacity);
+  DfArray *new_array = (DfArray *)new_array_res.value;
 
-  return new_array;
+  res.error = DF_OK;
+  res.value = new_array;
+  return res;
 }
 
-void dfarray_insert_new(void *new_ds, void *element)
+DfResult dfarray_insert_new(void *new_ds, void *element)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!new_ds || !element)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   DfArray *arr = (DfArray *)new_ds;
 
-  dfarray_push(arr, element);
+  DfResult push_res = dfarray_push(arr, element);
+  if (push_res.error)
+  {
+    return push_res;
+  }
+
+  res.error = DF_OK;
+  return res;
 }
 
 size_t dfarray_elem_size(Iterator *it)
@@ -283,28 +515,73 @@ size_t dfarray_elem_size(Iterator *it)
   return array->elem_size;
 }
 
-void dfarray_free_all(Iterator *it)
+DfResult dfarray_free_all(Iterator *it)
 {
+  DfResult res;
+  res.value = NULL;
+
+  if (!it || !it->structure)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
   DfArray *array = (DfArray *)it->structure;
+
+  if (!array->items)
+  {
+    res.error = DF_ERR_ALREADY_FREED;
+    return res;
+  }
+
   free(array->items);
   array->items = NULL;
   array->capacity = 0;
   array->length = 0;
+
+  res.error = DF_OK;
+  return res;
 }
 
-Iterator dfarray_iterator_create(DfArray *array)
+DfResult dfarray_iterator_create(DfArray *array)
 {
-  DfArray_Iterator *it = malloc(sizeof(DfArray_Iterator));
-  it->array = array;
-  it->index = 0;
+  DfResult res;
+  res.value = NULL;
 
-  return (Iterator){
-      .structure = array,
-      .current = it,
-      .next = dfarray_iterator_next,
-      .has_next = dfarray_iterator_has_next,
-      .create_new = dfarray_create_new,
-      .insert_new = dfarray_insert_new,
-      .elem_size = dfarray_elem_size,
-      .free_all = dfarray_free_all};
+  if (!array)
+  {
+    res.error = DF_ERR_NULL_PTR;
+    return res;
+  }
+
+  DfArray_Iterator *array_it = malloc(sizeof(DfArray_Iterator));
+  if (!array_it)
+  {
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
+  }
+
+  array_it->array = array;
+  array_it->index = 0;
+
+  Iterator *it = malloc(sizeof(Iterator));
+  if (!it)
+  {
+    free(array_it);
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
+  }
+
+  it->structure = array;
+  it->current = array_it;
+  it->next = dfarray_iterator_next;
+  it->has_next = dfarray_iterator_has_next;
+  it->create_new = dfarray_create_new;
+  it->insert_new = dfarray_insert_new;
+  it->elem_size = dfarray_elem_size;
+  it->free_all = dfarray_free_all;
+
+  res.error = DF_OK;
+  res.value = it;
+  return res;
 }
