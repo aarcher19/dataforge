@@ -513,8 +513,14 @@ if (res.error) {
     int new_num = 5;
     dfarray_push(array, &new_num);
 
-    iterator_destroy(&it);
-    dfarray_destroy(array);
+    DfResult it_des_res = iterator_destroy(&it);
+    if (it_des_res.error){
+      // Handle error
+    }
+    DfResult arr_des_res = dfarray_destroy(array);
+    if (arr_des_res.error){
+      // Handle error
+    }
   }
 }
 ```
