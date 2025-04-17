@@ -349,3 +349,57 @@ DfResult dflist_s_get(DfList_S *list, size_t index)
   res.value = target->element;
   return res;
 }
+
+DfResult dflist_s_peek_front(DfList_S *list)
+{
+  DfResult res = df_result_init();
+
+  df_null_ptr_check(list, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  if (!list->head)
+  {
+    res.error = DF_ERR_EMPTY;
+    return res;
+  }
+
+  res.value = list->head->element;
+  return res;
+}
+
+DfResult dflist_s_peek_back(DfList_S *list)
+{
+  DfResult res = df_result_init();
+
+  df_null_ptr_check(list, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  if (!list->tail)
+  {
+    res.error = DF_ERR_EMPTY;
+    return res;
+  }
+
+  res.value = list->tail->element;
+  return res;
+}
+
+DfResult dflist_s_length(DfList_S *list)
+{
+  DfResult res = df_result_init();
+
+  df_null_ptr_check(list, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  res.value = list->length;
+  return res;
+}

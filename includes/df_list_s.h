@@ -26,4 +26,10 @@ DfResult dflist_s_remove_at(DfList_S *list, size_t index);
 
 DfResult dflist_s_get(DfList_S *list, size_t index);
 
+DfResult dflist_s_peek_front(DfList_S *list);
+
+DfResult dflist_s_peek_back(DfList_S *list);
+
+DfResult dflist_s_length(DfList_S *list);
+
 #endif

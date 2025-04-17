@@ -4,6 +4,7 @@
 #include "../includes/df_array.h"
 #include "../includes/df_iterator.h"
 #include "../includes/df_common.h"
+#include "../internal/df_internal.h"
 
 // Core functionality
 
@@ -17,8 +18,7 @@ typedef struct DfArray
 
 DfResult dfarray_create(size_t elem_size, size_t initial_capacity)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
   DfArray *array = malloc(sizeof(DfArray));
   if (!array)
@@ -45,12 +45,11 @@ DfResult dfarray_create(size_t elem_size, size_t initial_capacity)
 
 DfResult dfarray_destroy(DfArray *array)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array)
+  df_null_ptr_check(array, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -63,14 +62,9 @@ DfResult dfarray_destroy(DfArray *array)
 
 DfResult dfarray_resize(DfArray *array)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array)
-  {
-    res.error = DF_ERR_NULL_PTR;
-    return res;
-  }
+  df_null_ptr_check(array, &res);
 
   size_t new_capacity;
   void *resized_items;
@@ -95,18 +89,16 @@ DfResult dfarray_resize(DfArray *array)
   array->items = resized_items;
   array->capacity = new_capacity;
 
-  res.error = DF_OK;
   return res;
 }
 
 DfResult dfarray_shrink(DfArray *array)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array)
+  df_null_ptr_check(array, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -116,7 +108,6 @@ DfResult dfarray_shrink(DfArray *array)
     array->items = NULL;
     array->capacity = 0;
 
-    res.error = DF_OK;
     return res;
   }
 
@@ -132,24 +123,22 @@ DfResult dfarray_shrink(DfArray *array)
   array->items = shrunk_items;
   array->capacity = new_capacity;
 
-  res.error = DF_OK;
   return res;
 }
 
 DfResult dfarray_get(DfArray *array, size_t index)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array)
+  df_null_ptr_check(array, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
-  if (index >= array->length)
+  df_index_check_access(index, array->length, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
     return res;
   }
 
@@ -163,41 +152,37 @@ DfResult dfarray_get(DfArray *array, size_t index)
   memcpy(dest, (char *)array->items + index * array->elem_size, array->elem_size);
 
   res.value = dest;
-  res.error = DF_OK;
   return res;
 }
 
 DfResult dfarray_set(DfArray *array, size_t index, void *value)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array)
+  df_null_ptr_check(array, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
-  if (index >= array->length)
+  df_index_check_access(index, array->length, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
     return res;
   }
 
   memcpy((char *)array->items + index * array->elem_size, value, array->elem_size);
 
-  res.error = DF_OK;
   return res;
 }
 
 DfResult dfarray_push(DfArray *array, void *value)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array)
+  df_null_ptr_check(array, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -213,18 +198,16 @@ DfResult dfarray_push(DfArray *array, void *value)
   memcpy((char *)array->items + array->length * array->elem_size, value, array->elem_size);
   array->length++;
 
-  res.error = DF_OK;
   return res;
 }
 
 DfResult dfarray_pop(DfArray *array)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array)
+  df_null_ptr_check(array, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -254,19 +237,17 @@ DfResult dfarray_pop(DfArray *array)
     }
   }
 
-  res.error = DF_OK;
   res.value = dest;
   return res;
 }
 
 DfResult dfarray_shift(DfArray *array)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array)
+  df_null_ptr_check(array, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -297,19 +278,18 @@ DfResult dfarray_shift(DfArray *array)
     }
   }
 
-  res.error = DF_OK;
   res.value = dest;
   return res;
 }
 
 DfResult dfarray_unshift(DfArray *array, void *value)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array || !value)
+  df_null_ptr_check(array, &res);
+  df_null_ptr_check(value, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -327,24 +307,23 @@ DfResult dfarray_unshift(DfArray *array, void *value)
 
   array->length++;
 
-  res.error = DF_OK;
   return res;
 }
 
 DfResult dfarray_insert_at(DfArray *array, size_t index, void *value)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array || !value)
+  df_null_ptr_check(array, &res);
+  df_null_ptr_check(value, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
-  if (index > array->length)
+  df_index_check_insert(index, array->length, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
     return res;
   }
 
@@ -376,24 +355,22 @@ DfResult dfarray_insert_at(DfArray *array, size_t index, void *value)
     }
   }
 
-  res.error = DF_OK;
   return res;
 }
 
 DfResult dfarray_remove_at(DfArray *array, size_t index)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array)
+  df_null_ptr_check(array, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
-  if (index >= array->length)
+  df_index_check_access(index, array->length, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
     return res;
   }
 
@@ -413,7 +390,6 @@ DfResult dfarray_remove_at(DfArray *array, size_t index)
     }
   }
 
-  res.error = DF_OK;
   return res;
 }
 
@@ -433,8 +409,7 @@ int dfarray_iterator_has_next(Iterator *it)
 
 DfResult dfarray_iterator_next(Iterator *it)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
   if (!it || !it->current)
   {
@@ -444,9 +419,9 @@ DfResult dfarray_iterator_next(Iterator *it)
 
   DfArray_Iterator *arr_it = (DfArray_Iterator *)it->current;
 
-  if (arr_it->index >= arr_it->array->length)
+  df_index_check_access(arr_it->index, arr_it->array->length, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
     return res;
   }
 
@@ -460,15 +435,13 @@ DfResult dfarray_iterator_next(Iterator *it)
 
   memcpy(copied_elem, elem_ptr, arr_it->array->elem_size);
 
-  res.error = DF_OK;
   res.value = copied_elem;
   return res;
 }
 
 DfResult dfarray_create_new(Iterator *it)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
   if (!it)
   {
@@ -481,15 +454,13 @@ DfResult dfarray_create_new(Iterator *it)
   DfResult new_array_res = dfarray_create(arr_it->array->elem_size, arr_it->array->capacity);
   DfArray *new_array = (DfArray *)new_array_res.value;
 
-  res.error = DF_OK;
   res.value = new_array;
   return res;
 }
 
 DfResult dfarray_insert_new(void *new_ds, void *element)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
   if (!new_ds || !element)
   {
@@ -505,7 +476,6 @@ DfResult dfarray_insert_new(void *new_ds, void *element)
     return push_res;
   }
 
-  res.error = DF_OK;
   return res;
 }
 
@@ -517,8 +487,7 @@ size_t dfarray_elem_size(Iterator *it)
 
 DfResult dfarray_free_all(Iterator *it)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
   if (!it || !it->structure)
   {
@@ -539,18 +508,16 @@ DfResult dfarray_free_all(Iterator *it)
   array->capacity = 0;
   array->length = 0;
 
-  res.error = DF_OK;
   return res;
 }
 
 DfResult dfarray_iterator_create(DfArray *array)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!array)
+  df_null_ptr_check(array, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -581,7 +548,6 @@ DfResult dfarray_iterator_create(DfArray *array)
   it->elem_size = dfarray_elem_size;
   it->free_all = dfarray_free_all;
 
-  res.error = DF_OK;
   res.value = it;
   return res;
 }
