@@ -393,6 +393,20 @@ DfResult dfarray_remove_at(DfArray *array, size_t index)
   return res;
 }
 
+DfResult dfarray_length(DfArray *array)
+{
+  DfResult res = df_result_init();
+
+  df_null_ptr_check(array, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  res.value = array->length;
+  return res;
+}
+
 // Iterator
 
 typedef struct DfArray_Iterator
