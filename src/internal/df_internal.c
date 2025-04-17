@@ -1,11 +1,6 @@
 #include "../../internal/df_internal.h"
 #include "../../includes/df_common.h"
 
-static inline DfResult df_result_init()
-{
-    return (DfResult){.error = DF_OK, .value = NULL};
-}
-
 void df_null_ptr_check(void *ptr, DfResult *res)
 {
     if (!ptr)
