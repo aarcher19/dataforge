@@ -2,6 +2,7 @@
 #define LIST_S_H
 
 #include "df_common.h"
+#include <stdlib.h>
 
 typedef struct DfList_S DfList_S;
 
@@ -18,5 +19,11 @@ DfResult dflist_s_push_front(DfList_S *list, void *element);
 DfResult dflist_s_pop_front(DfList_S *list);
 
 DfResult dflist_s_pop_back(DfList_S *list);
+
+DfResult dflist_s_insert_at(DfList_S *list, void *element, size_t index);
+
+DfResult dflist_s_remove_at(DfList_S *list, size_t index);
+
+DfResult dflist_s_get(DfList_S *list, size_t index);
 
 #endif
