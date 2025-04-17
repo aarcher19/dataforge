@@ -3,12 +3,18 @@ CFLAGS = -Wall -Wextra -fPIC
 LDFLAGS = -shared 
 
 INCLUDES_DIR = includes
+INTERNAL_DIR = internal
 SRC_DIR = src
 BUILD_DIR = build
 LIB_DIR = lib
 UTIL_DIR = $(SRC_DIR)/utils
+INTERNAL_SRC_DIR = $(SRC_DIR)/internal
 
-SRC_FILES = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(UTIL_DIR)/*.c)
+SRC_FILES = \
+	$(wildcard $(SRC_DIR)/*.c) \
+	$(wildcard $(UTIL_DIR)/*.c) \
+	$(wildcard $(INTERNAL_SRC_DIR)/*.c)
+
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC_FILES))
 
 LIB_NAME = $(LIB_DIR)/libdataforge.so
@@ -19,10 +25,13 @@ $(LIB_NAME): $(OBJ_FILES)
 	$(CC) $(LDFLAGS) $(OBJ_FILES) -o $(LIB_NAME)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -I$(INCLUDES_DIR) -c $< -o $@
+	$(CC) $(CFLAGS) -I$(INCLUDES_DIR) -I$(INTERNAL_DIR) -c $< -o $@
 
 $(BUILD_DIR)/%.o: $(UTIL_DIR)/%.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -I$(INCLUDES_DIR) -c $< -o $@
+	$(CC) $(CFLAGS) -I$(INCLUDES_DIR) -I$(INTERNAL_DIR) -c $< -o $@
+
+$(BUILD_DIR)/%.o: $(INTERNAL_SRC_DIR)/%.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -I$(INCLUDES_DIR) -I$(INTERNAL_DIR) -c $< -o $@
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)

@@ -1,5 +1,6 @@
 #include "../includes/df_list_s.h"
 #include "../includes/df_common.h"
+#include "../internal/df_internal.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -19,8 +20,7 @@ typedef struct DfList_S_Node
 
 DfResult dflist_s_create()
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
   DfList_S *list = malloc(sizeof(DfList_S));
   if (!list)
@@ -32,19 +32,17 @@ DfResult dflist_s_create()
   list->head = list->tail = NULL;
   list->length = 0;
 
-  res.error = DF_OK;
   res.value = list;
   return res;
 }
 
 DfResult dflist_s_destroy(DfList_S *list, void (*cleanup)(void *element))
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!list)
+  df_null_ptr_check(list, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -53,21 +51,27 @@ DfResult dflist_s_destroy(DfList_S *list, void (*cleanup)(void *element))
   {
     DfList_S_Node *next = current->next;
     if (cleanup)
+    {
       cleanup(current->element);
+    }
     free(current);
     current = next;
   }
 
   free(list);
 
-  res.error = DF_OK;
   return res;
 }
 
 DfResult dflist_s_create_node(void *element)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
+
+  df_null_ptr_check(element, &res);
+  if (res.error)
+  {
+    return res;
+  }
 
   DfList_S_Node *new_node = malloc(sizeof(DfList_S_Node));
   if (!new_node)
@@ -79,28 +83,28 @@ DfResult dflist_s_create_node(void *element)
   new_node->element = element;
   new_node->next = NULL;
 
-  res.error = DF_OK;
   res.value = new_node;
   return res;
 }
 
 DfResult dflist_s_push_back(DfList_S *list, void *element)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!list)
+  df_null_ptr_check(list, &res);
+  df_null_ptr_check(element, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
   DfResult new_node_res = dflist_s_create_node(element);
-  DfList_S_Node *new_node = (DfList_S_Node *)new_node_res.value;
-  if (new_node_res.error != DF_OK)
+  if (new_node_res.error)
   {
     return new_node_res;
   }
+
+  DfList_S_Node *new_node = (DfList_S_Node *)new_node_res.value;
 
   if (!list->head)
   {
@@ -115,27 +119,27 @@ DfResult dflist_s_push_back(DfList_S *list, void *element)
 
   list->length++;
 
-  res.error = DF_OK;
   return res;
 }
 
 DfResult dflist_s_push_front(DfList_S *list, void *element)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!list)
+  df_null_ptr_check(list, &res);
+  df_null_ptr_check(element, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
   DfResult new_node_res = dflist_s_create_node(element);
-  DfList_S_Node *new_node = (DfList_S_Node *)new_node_res.value;
-  if (new_node_res.error != DF_OK)
+  if (new_node_res.error)
   {
     return new_node_res;
   }
+
+  DfList_S_Node *new_node = (DfList_S_Node *)new_node_res.value;
 
   if (!list->head)
   {
@@ -150,18 +154,16 @@ DfResult dflist_s_push_front(DfList_S *list, void *element)
 
   list->length++;
 
-  res.error = DF_OK;
   return res;
 }
 
 DfResult dflist_s_pop_front(DfList_S *list)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!list)
+  df_null_ptr_check(list, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -177,7 +179,6 @@ DfResult dflist_s_pop_front(DfList_S *list)
   free(old_head);
   list->length--;
 
-  res.error = DF_OK;
   res.value = dest;
   // Ensure to document user takes control of element memory (need to free it when done)
   return res;
@@ -185,12 +186,11 @@ DfResult dflist_s_pop_front(DfList_S *list)
 
 DfResult dflist_s_pop_back(DfList_S *list)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!list)
+  df_null_ptr_check(list, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -226,7 +226,6 @@ DfResult dflist_s_pop_back(DfList_S *list)
 
   list->length--;
 
-  res.error = DF_OK;
   res.value = dest;
   // Ensure to document user takes control of element memory (need to free it when done)
   return res;
@@ -234,18 +233,18 @@ DfResult dflist_s_pop_back(DfList_S *list)
 
 DfResult dflist_s_insert_at(DfList_S *list, void *element, size_t index)
 {
-  DfResult res;
-  res.value = NULL;
+  DfResult res = df_result_init();
 
-  if (!list)
+  df_null_ptr_check(list, &res);
+  df_null_ptr_check(element, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
-  if (index > list->length)
+  df_index_check_insert(index, list->length, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_INDEX_OUT_OF_BOUNDS;
     return res;
   }
 
@@ -262,13 +261,12 @@ DfResult dflist_s_insert_at(DfList_S *list, void *element, size_t index)
   }
 
   DfResult new_node_res = dflist_s_create_node(element);
-  DfList_S_Node *new_node = (DfList_S_Node *)new_node_res.value;
   if (new_node_res.error != DF_OK)
   {
     return new_node_res;
   }
 
-  size_t i = 0;
+  DfList_S_Node *new_node = (DfList_S_Node *)new_node_res.value;
   DfList_S_Node *cur = list->head;
 
   for (size_t i = 0; i < index - 1; i++)
@@ -280,6 +278,74 @@ DfResult dflist_s_insert_at(DfList_S *list, void *element, size_t index)
   cur->next = new_node;
   list->length++;
 
-  res.error = DF_OK;
+  return res;
+}
+
+DfResult dflist_s_remove_at(DfList_S *list, size_t index)
+{
+  DfResult res = df_result_init();
+
+  df_null_ptr_check(list, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  df_index_check_access(index, list->length, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  if (index == 0)
+  {
+    DfResult pop_front_res = dflist_s_pop_front(list);
+    return pop_front_res;
+  }
+
+  if (index == list->length - 1)
+  {
+    DfResult pop_back_res = dflist_s_pop_back(list);
+    return pop_back_res;
+  }
+
+  DfList_S_Node *cur = list->head;
+  for (size_t i = 0; i < index - 1; i++)
+  {
+    cur = cur->next;
+  }
+
+  DfList_S_Node *old = cur->next;
+  cur->next = old->next;
+  res.value = old->element;
+  free(old);
+  list->length--;
+
+  return res;
+}
+
+DfResult dflist_s_get(DfList_S *list, size_t index)
+{
+  DfResult res = df_result_init();
+
+  df_null_ptr_check(list, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  df_index_check_access(index, list->length, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  DfList_S_Node *target = list->head;
+  for (size_t i = 0; i < index; i++)
+  {
+    target = target->next;
+  }
+
+  res.value = target->element;
   return res;
 }

@@ -3,14 +3,9 @@
 
 #include "df_common.h"
 
-// Single Linked
 typedef struct DfList_S DfList_S;
 
 typedef struct DfList_S_Node DfList_S_Node;
-
-// typedef struct DfList_D DfList_D;
-
-// typedef struct DfList_D_Node DfList_D_Node;
 
 DfResult dflist_s_create();
 
