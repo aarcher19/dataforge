@@ -403,3 +403,43 @@ DfResult dflist_s_length(DfList_S *list)
   res.value = list->length;
   return res;
 }
+
+// Iterator
+
+typedef struct DfList_S_Iterator
+{
+  DfList_S *list;
+  DfList_S_Node *cur;
+} DfList_S_Iterator;
+
+int dflist_s_iterator_has_next(Iterator *it)
+{
+  DfList_S_Iterator *list_it = (DfList_S_Iterator *)it->current;
+  return list_it->cur != NULL && list_it->cur->next != NULL;
+}
+
+DfResult dflist_s_iterator_next(Iterator *it)
+{
+  DfResult res = df_result_init();
+
+  df_null_ptr_check(it, &res);
+  df_null_ptr_check(it->current, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  DfList_S_Iterator *list_it = (DfList_S_Iterator *)it->current;
+
+  if (!list_it->cur || !list_it->cur->next)
+  {
+    res.error = DF_ERR_END_OF_LIST;
+    return res;
+  }
+
+  list_it->cur = list_it->cur->next;
+  res.value = list_it->cur->element;
+  return res;
+}
+
+DfResult dflist_s_iterator_create(DfList_S *list);

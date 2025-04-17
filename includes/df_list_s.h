@@ -2,6 +2,7 @@
 #define LIST_S_H
 
 #include "df_common.h"
+#include "df_iterator.h"
 #include <stdlib.h>
 
 typedef struct DfList_S DfList_S;
@@ -31,5 +32,15 @@ DfResult dflist_s_peek_front(DfList_S *list);
 DfResult dflist_s_peek_back(DfList_S *list);
 
 DfResult dflist_s_length(DfList_S *list);
+
+// Iterator
+
+typedef struct DfList_S_Iterator DfList_S_Iterator;
+
+DfResult dflist_s_iterator_create(DfList_S *list);
+
+int dflist_s_iterator_has_next(Iterator *it);
+
+DfResult dflist_s_iterator_next(Iterator *it);
 
 #endif

@@ -11,6 +11,7 @@ typedef enum
     DF_ERR_EMPTY,
     DF_ERR_ALREADY_FREED,
     DF_ERR_ELEMENT_NOT_FOUND,
+    DF_ERR_END_OF_LIST,
 } DfError;
 
 const char *df_error_to_string(DfError err);
