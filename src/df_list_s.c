@@ -442,4 +442,76 @@ DfResult dflist_s_iterator_next(Iterator *it)
   return res;
 }
 
-DfResult dflist_s_iterator_create(DfList_S *list);
+DfResult dflist_s_free_all(Iterator *it)
+{
+  DfResult res = df_result_init();
+
+  df_null_ptr_check(it, &res);
+  df_null_ptr_check(it->structure, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  DfList_S *list = (DfList_S *)it->structure;
+
+  if (!list->head)
+  {
+    res.error = DF_ERR_ALREADY_FREED;
+    return res;
+  }
+
+  DfList_S_Node *cur = list->head;
+  while (cur)
+  {
+    DfList_S_Node *temp = cur->next;
+    free(cur);
+    cur = temp;
+  }
+
+  list->head = NULL;
+  list->tail = NULL;
+  list->length = 0;
+  return res;
+}
+
+DfResult dflist_s_iterator_create(DfList_S *list)
+{
+  DfResult res = df_result_init();
+
+  df_null_ptr_check(list, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  DfList_S_Iterator *list_it = malloc(sizeof(DfList_S_Iterator));
+  if (!list_it)
+  {
+    res.error = DF_ERR_ALLOC_FAILED;
+    return res;
+  }
+
+  list_it->list = list;
+  list_it->cur = list->head;
+
+  DfResult it_res = iterator_create();
+  if (it_res.error)
+  {
+    free(list_it);
+    return it_res;
+  }
+
+  Iterator *it = (Iterator *)it_res.value;
+
+  it->structure = list;
+  it->current = list_it;
+  it->next = dflist_s_iterator_next;
+  it->has_next = dflist_s_iterator_has_next;
+  it->create_new = dflist_s_create;
+  it->insert_new = dflist_s_push_back;
+  it->free_all = dflist_s_free_all;
+
+  res.value = it;
+  return res;
+}

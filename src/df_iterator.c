@@ -1,14 +1,30 @@
 #include <stdlib.h>
 #include "../includes/df_iterator.h"
 #include "../includes/df_common.h"
+#include "../internal/df_internal.h"
+
+DfResult iterator_create()
+{
+    DfResult res = df_result_init();
+
+    Iterator *it = malloc(sizeof(Iterator));
+    if (!it)
+    {
+        res.error = DF_ERR_ALLOC_FAILED;
+        return res;
+    }
+
+    res.value = it;
+    return res;
+}
 
 DfResult iterator_destroy(Iterator *it)
 {
-    DfResult res;
-    res.value = NULL;
-    if (!it)
+    DfResult res = df_result_init();
+
+    df_null_ptr_check(it, &res);
+    if (res.error)
     {
-        res.error = DF_ERR_NULL_PTR;
         return res;
     }
 
@@ -18,6 +34,5 @@ DfResult iterator_destroy(Iterator *it)
         it->current = NULL;
     }
 
-    res.error = DF_OK;
     return res;
 }

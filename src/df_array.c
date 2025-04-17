@@ -549,13 +549,14 @@ DfResult dfarray_iterator_create(DfArray *array)
   array_it->array = array;
   array_it->index = 0;
 
-  Iterator *it = malloc(sizeof(Iterator));
-  if (!it)
+  DfResult it_res = iterator_create();
+  if (it_res.error)
   {
     free(array_it);
-    res.error = DF_ERR_ALLOC_FAILED;
-    return res;
+    return it_res;
   }
+
+  Iterator *it = (Iterator *)it_res.value;
 
   it->structure = array;
   it->current = array_it;

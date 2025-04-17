@@ -17,6 +17,8 @@ typedef struct Iterator
     DfResult (*free_all)(struct Iterator *);             // Free the iterator and all resources
 } Iterator;
 
+DfResult iterator_create();
+
 DfResult iterator_destroy(Iterator *it);
 
 #endif
