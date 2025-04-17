@@ -425,9 +425,10 @@ DfResult dfarray_iterator_next(Iterator *it)
 {
   DfResult res = df_result_init();
 
-  if (!it || !it->current)
+  df_null_ptr_check(it, &res);
+  df_null_ptr_check(it->current, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -457,9 +458,10 @@ DfResult dfarray_create_new(Iterator *it)
 {
   DfResult res = df_result_init();
 
-  if (!it)
+  df_null_ptr_check(it, &res);
+  df_null_ptr_check(it->current, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -476,9 +478,10 @@ DfResult dfarray_insert_new(void *new_ds, void *element)
 {
   DfResult res = df_result_init();
 
-  if (!new_ds || !element)
+  df_null_ptr_check(new_ds, &res);
+  df_null_ptr_check(element, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
@@ -503,9 +506,10 @@ DfResult dfarray_free_all(Iterator *it)
 {
   DfResult res = df_result_init();
 
-  if (!it || !it->structure)
+  df_null_ptr_check(it, &res);
+  df_null_ptr_check(it->structure, &res);
+  if (res.error)
   {
-    res.error = DF_ERR_NULL_PTR;
     return res;
   }
 
