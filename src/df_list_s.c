@@ -400,7 +400,7 @@ DfResult dflist_s_length(DfList_S *list)
     return res;
   }
 
-  res.value = list->length;
+  res.value = (void *)list->length;
   return res;
 }
 
@@ -439,6 +439,28 @@ DfResult dflist_s_iterator_next(Iterator *it)
 
   list_it->cur = list_it->cur->next;
   res.value = list_it->cur->element;
+  return res;
+}
+
+DfResult dflist_s_insert_new(void *new_ds, void *element)
+{
+  DfResult res = df_result_init();
+
+  df_null_ptr_check(new_ds, &res);
+  df_null_ptr_check(element, &res);
+  if (res.error)
+  {
+    return res;
+  }
+
+  DfList_S *list = (DfList_S *)new_ds;
+
+  DfResult push_res = dflist_s_push_back(list, element);
+  if (push_res.error)
+  {
+    return push_res;
+  }
+
   return res;
 }
 
@@ -509,7 +531,7 @@ DfResult dflist_s_iterator_create(DfList_S *list)
   it->next = dflist_s_iterator_next;
   it->has_next = dflist_s_iterator_has_next;
   it->create_new = dflist_s_create;
-  it->insert_new = dflist_s_push_back;
+  it->insert_new = dflist_s_insert_new;
   it->free_all = dflist_s_free_all;
 
   res.value = it;

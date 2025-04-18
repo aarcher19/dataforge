@@ -23,137 +23,227 @@ Data Forge is a lightweight and extensible C library that provides high-level co
   <details>
     <summary><strong>Usage</strong></summary>
 
-  #### Creating and Destroying an Array
-  ```c
-  DfArray *array = dfarray_create(sizeof(int), 10);
-  dfarray_destroy(array);
-  ```
+<details>
+  <summary><strong>Creating and Destroying an Array</strong></summary>
 
-  #### Getting and Setting Elements
-  ```c
-  int num = 10;
-  DfResult set_result = dfarray_set(array, 1, &num);
-  if (set_result.error != DF_OK) {
-      printf("Set error: %s\n", df_error_to_string(set_result.error));
-  }
+```c
+DfResult res = dfarray_create(sizeof(int), 10);
+DfArray *array = (DfArray *)res.value;
+if (res.error != DF_OK) {
+    printf("Create error: %s\n", df_error_to_string(res.error));
+    return;
+}
 
-  DfResult get_result = dfarray_get(array, 1);
-  if (get_result.error == DF_OK) {
-      int *retrieved = (int *)get_result.value;
-      printf("Retrieved value: %d\n", *retrieved);
-      free(retrieved);
-  } else {
-      printf("Get error: %s\n", df_error_to_string(get_result.error));
-  }
-  ```
+DfResult destroy_result = dfarray_destroy(array);
+if (destroy_result.error != DF_OK) {
+    printf("Destroy error: %s\n", df_error_to_string(destroy_result.error));
+}
+```
+</details>
 
-  #### Adding and Removing Elements
-  ```c
-  int value = 42;
-  dfarray_push(array, &value);
+<details>
+  <summary><strong>Getting and Setting Elements</strong></summary>
 
-  DfResult pop_result = dfarray_pop(array);
-  if (pop_result.error == DF_OK) {
-      int *popped = (int *)pop_result.value;
-      printf("Popped value: %d\n", *popped);
-      free(popped);
-  }
+```c
+int num = 10;
+DfResult set_result = dfarray_set(array, 1, &num);
+if (set_result.error != DF_OK) {
+    printf("Set error: %s\n", df_error_to_string(set_result.error));
+}
 
-  int value2 = 25;
-  dfarray_unshift(array, &value2);
+DfResult get_result = dfarray_get(array, 1);
+if (get_result.error == DF_OK) {
+    int *retrieved = (int *)get_result.value;
+    printf("Retrieved value: %d\n", *retrieved);
+    free(retrieved);
+} else {
+    printf("Get error: %s\n", df_error_to_string(get_result.error));
+}
+```
+</details>
 
-  DfResult shift_result = dfarray_shift(array);
-  if (shift_result.error == DF_OK) {
-      int *shifted = (int *)shift_result.value;
-      printf("Shifted value: %d\n", *shifted);
-      free(shifted);
-  }
+<details>
+  <summary><strong>Adding and Removing Elements</strong></summary>
 
-  int value3 = 30;
-  dfarray_insert_at(array, 1, &value3);
+```c
+int value = 42;
+dfarray_push(array, &value);
 
-  DfResult inserted_result = dfarray_get(array, 1);
-  if (inserted_result.error == DF_OK) {
-      int *inserted = (int *)inserted_result.value;
-      printf("Inserted value: %d\n", *inserted);
-      free(inserted);
-  }
+DfResult pop_result = dfarray_pop(array);
+if (pop_result.error == DF_OK) {
+    int *popped = (int *)pop_result.value;
+    printf("Popped value: %d\n", *popped);
+    free(popped);
+}
 
-  dfarray_remove_at(array, 1);
-  ```
+int value2 = 25;
+dfarray_unshift(array, &value2);
 
-  #### Iteration
-  ```c
-  DfArray *array = dfarray_create(sizeof(int), 3);
-  int nums[] = {10, 20, 30};
-  for (int i = 0; i < 3; i++) {
-      dfarray_push(array, &nums[i]);
-  }
+DfResult shift_result = dfarray_shift(array);
+if (shift_result.error == DF_OK) {
+    int *shifted = (int *)shift_result.value;
+    printf("Shifted value: %d\n", *shifted);
+    free(shifted);
+}
 
-  Iterator it = dfarray_iterator_create(array);
-  while (it.has_next(&it)) {
-      void *val = it.next(&it);
-      printf("Value: %d\n", *(int *)val);
-  }
+int value3 = 30;
+dfarray_insert_at(array, 1, &value3);
 
-  iterator_destroy(&it);
-  dfarray_destroy(array);
-  ```
+DfResult inserted_result = dfarray_get(array, 1);
+if (inserted_result.error == DF_OK) {
+    int *inserted = (int *)inserted_result.value;
+    printf("Inserted value: %d\n", *inserted);
+    free(inserted);
+}
 
-  #### Applying a Function to All Elements
-  ```c
-  void printInt(void *item) {
-      printf("%d\n", *(int *)item);
-  }
-  dfarray_map(array, printInt);
-  ```
+dfarray_remove_at(array, 1);
+```
+</details>
 
+<details>
+  <summary><strong>Iteration</strong></summary>
+
+```c
+DfResult create_result = dfarray_create(sizeof(int), 3);
+DfArray *array = (DfArray *)create_result.value;
+int nums[] = {10, 20, 30};
+for (int i = 0; i < 3; i++) {
+    dfarray_push(array, &nums[i]);
+}
+
+DfResult it_result = dfarray_iterator_create(array);
+if (it_result.error != DF_OK) {
+    printf("Iterator create error: %s\n", df_error_to_string(it_result.error));
+    dfarray_destroy(array);
+    return;
+}
+
+Iterator *it = (Iterator *)it_result.value;
+
+while (it->has_next(it)) {
+    DfResult next_res = it->next(it);
+    if (next_res.error == DF_OK) {
+        int *val = (int *)next_res.value;
+        printf("Value: %d\n", *val);
+        free(val);
+    }
+}
+
+// Clean up
+it->free_all(it);
+dfarray_destroy(array);
+```
+</details>
   </details>
 
   <details>
     <summary><strong>API Reference</strong></summary>
 
-  #### `DfArray* dfarray_create(size_t elem_size, size_t initial_capacity)`
-  Allocates a new dynamic array.
+### `DfResult dfarray_create(size_t elem_size, size_t initial_capacity)`
+Creates a new dynamic array with a specific element size and initial capacity.  
+✅ **Returns:**  
+- `value`: `(DfArray *)` — pointer to the newly allocated dynamic array.  
+- `error`: `DF_OK` on success, or an error code on failure.
 
-  #### `void dfarray_destroy(DfArray* array)`
-  Frees memory associated with the array.
+---
 
-  #### `DfResult dfarray_push(DfArray* array, void *value)`
-  Adds an element to the end. Returns `DF_OK` or error code.
+### `DfResult dfarray_destroy(DfArray *array)`
+Frees memory associated with the dynamic array.  
+✅ **Returns:**  
+- `value`: `NULL`.  
+- `error`: `DF_OK` on success, or `DF_ERR_NULL_PTR` if `array` is `NULL`.
 
-  #### `DfResult dfarray_pop(DfArray* array)`
-  Removes and retrieves the last element. `value` contains the element if successful.
+---
 
-  #### `DfResult dfarray_unshift(DfArray* array, void *value)`
-  Adds an element to the front.
+### `DfResult dfarray_push(DfArray *array, void *value)`
+Appends an element to the end of the array.  
+✅ **Returns:**  
+- `value`: `NULL`.  
+- `error`: `DF_OK` on success, or error if memory reallocation fails.
 
-  #### `DfResult dfarray_shift(DfArray* array)`
-  Removes and retrieves the first element.
+---
 
-  #### `DfResult dfarray_set(DfArray* array, size_t index, void *value)`
-  Updates an element at a given index.
+### `DfResult dfarray_pop(DfArray *array)`
+Removes the last element from the array.  
+✅ **Returns:**  
+- `value`: `(void *)` — pointer to a **heap-allocated copy** of the removed element.  
+- Caller is responsible for freeing the value.  
+- `error`: `DF_OK` on success, or `DF_ERR_EMPTY` if the array is empty.
 
-  #### `DfResult dfarray_get(DfArray* array, size_t index)`
-  Retrieves an element with bounds checking.
+---
 
-  #### `DfResult dfarray_insert_at(DfArray* array, size_t index, void *value)`
-  Inserts an element at a specified index and shifts elements to the right.
+### `DfResult dfarray_unshift(DfArray *array, void *value)`
+Inserts an element at the beginning of the array.  
+✅ **Returns:**  
+- `value`: `NULL`.  
+- `error`: `DF_OK` on success, or an error code if memory reallocation fails.
 
-  #### `DfResult dfarray_remove_at(DfArray* array, size_t index)`
-  Removes an element at a specified index and shifts elements to the left.
+---
 
-  #### `void dfarray_map(DfArray *array, void (*func)(void *))`
-  Applies a function to each element.
+### `DfResult dfarray_shift(DfArray *array)`
+Removes the first element from the array.  
+✅ **Returns:**  
+- `value`: `(void *)` — pointer to a **heap-allocated copy** of the removed element.  
+- Caller must `free()` the returned pointer.  
+- `error`: `DF_OK` on success, or `DF_ERR_EMPTY` if the array is empty.
 
-  #### `Iterator dfarray_iterator_create(DfArray *array)`
-  Creates an iterator for a dynamic array.
+---
 
-  #### `int dfarray_iterator_has_next(Iterator *it)`
-  Checks if there is a next value to iterate over.
+### `DfResult dfarray_set(DfArray *array, size_t index, void *value)`
+Overwrites the value at the specified index.  
+✅ **Returns:**  
+- `value`: `NULL`.  
+- `error`: `DF_OK` on success, or `DF_ERR_INDEX_OUT_OF_BOUNDS`.
 
-  #### `void *dfarray_iterator_next(Iterator *it)`
-  Retrieves the next value in the array.
+---
+
+### `DfResult dfarray_get(DfArray *array, size_t index)`
+Retrieves the element at the specified index.  
+✅ **Returns:**  
+- `value`: `(void *)` — pointer to a **heap-allocated copy** of the element.  
+- Caller must `free()` the returned pointer.  
+- `error`: `DF_OK` on success, or `DF_ERR_INDEX_OUT_OF_BOUNDS`.
+
+---
+
+### `DfResult dfarray_insert_at(DfArray *array, size_t index, void *value)`
+Inserts an element at the specified index, shifting subsequent elements right.  
+✅ **Returns:**  
+- `value`: `NULL`.  
+- `error`: `DF_OK` on success, or an error code if index is invalid or reallocation fails.
+
+---
+
+### `DfResult dfarray_remove_at(DfArray *array, size_t index)`
+Removes the element at the specified index, shifting remaining elements left.  
+✅ **Returns:**  
+- `value`: `(void *)` — pointer to a **heap-allocated copy** of the removed element.  
+- Caller is responsible for freeing the memory.  
+- `error`: `DF_OK` on success, or `DF_ERR_INDEX_OUT_OF_BOUNDS`.
+
+---
+
+### `DfResult dfarray_iterator_create(DfArray *array)`
+Initializes a generic `Iterator` for the given array.  
+✅ **Returns:**  
+- `value`: `(Iterator *)` — pointer to a heap-allocated iterator.  
+- `error`: `DF_OK` on success, or error if memory allocation fails.
+
+---
+
+### `int dfarray_iterator_has_next(Iterator *it)`
+Checks if there are more elements in the iteration.  
+✅ **Returns:**  
+- `1` if more elements exist, `0` otherwise.
+
+---
+
+### `DfResult dfarray_iterator_next(Iterator *it)`
+Retrieves the next element from the iterator.  
+✅ **Returns:**  
+- `value`: `(void *)` — pointer to a **heap-allocated copy** of the current element.  
+- Caller must `free()` the returned pointer.  
+- `error`: `DF_OK` if successful, or `DF_ERR_ITER_END` if no more elements.
 
   </details>
 </details>
@@ -174,24 +264,30 @@ Data Forge is a lightweight and extensible C library that provides high-level co
 - **Deletion** – Remove elements from the front or back.
 - **Safe Memory Management** – Custom cleanup function for freeing stored data.
 - **Robust Error Handling** – Returns `DfResult` with error codes for safer programming.
-
+- **Iteration**: Iterate sequentially through all elements.
 ---
 
 <details>
 <summary><strong>Usage</strong></summary>
 
+<details>
+  <summary><strong>Creating and Destroying a List</strong></summary>
+
 ```c
-DfResult res = dflist_s_create();
-DfList_S *list = (DfList_S *)res.value;
+DfResult res_create = dflist_s_create();
+if (res_create.error != DF_OK) {
+    printf("Create error: %s\n", df_error_to_string(res_create.error));
+    return;
+}
+DfList_S *list = (DfList_S *)res_create.value;
 
-dflist_s_push_back(list, my_data);
-dflist_s_push_front(list, other_data);
 
-DfResult popped = dflist_s_pop_back(list);
-// Remember to free the popped element if necessary
-
-dflist_s_destroy(list, free); // free each element using user-defined cleanup
+DfResult destroy_result = dfarray_destroy(array);
+if (destroy_result.error != DF_OK) {
+    printf("Destroy error: %s\n", df_error_to_string(destroy_result.error));
+}
 ```
+</details>
 
 </details>
 
@@ -236,8 +332,6 @@ Data Forge uses a monolithic utils header for ease of use. To use any utility fu
 ```c
 #include <dataforge/df_utils.h>
 ```
-
-
 
 <details>
   <summary><strong>Generic - Can be used with any data structure</strong></summary>

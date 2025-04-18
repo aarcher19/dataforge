@@ -27,6 +27,8 @@ DfResult dfarray_insert_at(DfArray *array, size_t index, void *value);
 
 DfResult dfarray_remove_at(DfArray *array, size_t index);
 
+DfResult dfarray_length(DfArray *array);
+
 // Iterator
 typedef struct DfArray_Iterator DfArray_Iterator;
 

@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "df_common.h": "c",
+        "df_array.h": "c"
+    }
+}

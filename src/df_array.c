@@ -403,7 +403,7 @@ DfResult dfarray_length(DfArray *array)
     return res;
   }
 
-  res.value = array->length;
+  res.value = (void *)array->length;
   return res;
 }
 
